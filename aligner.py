@@ -464,7 +464,10 @@ def save_segments_as_srt(
             speaker = segment[0]["speaker_id"]
             if speaker_map:
                 speaker = speaker_map.get(speaker, speaker)
-            label = f"[{speaker}] " if speaker_brackets else ""
+            if speaker_brackets:
+                label = f"- [{speaker}] "
+            else:
+                label = f"[{speaker}] "
             f.write(f"{idx}\n{start} --> {end}\n{label}{text}\n\n")
 
 
