@@ -182,6 +182,35 @@ def print_segments(segments: List[List[Dict]]):
         print(f"Segment {i}: [{speaker}] ({start:.2f}-{end:.2f})\n{text}\n")
 
 
+def get_grouped_segments(words: List[Dict], language_code: str = "eng", max_duration: float = 15.0) -> List[List[Dict]]:
+    """
+    Returns grouped segments (list of list of word dicts) using the aligner logic.
+    """
+    initial_segments = initial_grouping(words)
+    split_segments = split_long_segments_on_sentence(initial_segments, max_duration=max_duration, language_code=language_code)
+    final_segments = merge_on_sentence_boundary(split_segments, language_code=language_code)
+    return final_segments
+
+
+def save_segments_as_srt(segments: List[List[Dict]], filepath: str):
+    """
+    Save segments as an SRT file.
+    """
+    def format_time(seconds):
+        h = int(seconds // 3600)
+        m = int((seconds % 3600) // 60)
+        s = int(seconds % 60)
+        ms = int((seconds - int(seconds)) * 1000)
+        return f"{h:02}:{m:02}:{s:02},{ms:03}"
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        for idx, segment in enumerate(segments, 1):
+            start = format_time(segment[0]['start'])
+            end = format_time(segment[-1]['end'])
+            text = " ".join(w['text'] for w in segment)
+            f.write(f"{idx}\n{start} --> {end}\n{text}\n\n")
+
+
 # Add a main() function for pip install entry point
 
 
