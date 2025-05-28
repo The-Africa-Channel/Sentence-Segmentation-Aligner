@@ -1,5 +1,9 @@
 import unittest
-from aligner import initial_grouping, merge_on_sentence_boundary
+from aligner import (
+    initial_grouping,
+    merge_on_sentence_boundary,
+    get_grouped_segments,
+)
 
 
 class TestAligner(unittest.TestCase):
@@ -35,6 +39,15 @@ class TestAligner(unittest.TestCase):
         self.assertEqual(" ".join(w["text"] for w in merged[0]), "Hello world.")
         self.assertEqual(" ".join(w["text"] for w in merged[1]), "How are you?")
         self.assertEqual(" ".join(w["text"] for w in merged[2]), "I am fine.")
+
+    def test_custom_parameters(self):
+        segments = get_grouped_segments(
+            self.words,
+            big_pause_seconds=0.1,
+            min_words_in_segment=1,
+            skip_punctuation_only=True,
+        )
+        self.assertEqual(len(segments), 3)
 
 
 if __name__ == "__main__":

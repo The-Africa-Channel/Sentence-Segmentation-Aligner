@@ -17,7 +17,7 @@ if not os.path.exists(SAMPLE_JSON):
 # Run the aligner script with the sample transcription file
 try:
     result = subprocess.run(
-        [sys.executable, ALIGNER_SCRIPT, SAMPLE_JSON],
+        [sys.executable, ALIGNER_SCRIPT, SAMPLE_JSON, "--speaker-brackets"],
         cwd=os.path.dirname(__file__),
         check=True,
         capture_output=True,
