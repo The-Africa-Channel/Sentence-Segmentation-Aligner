@@ -9,6 +9,9 @@ A Python tool for segmenting and aligning sentences in transcriptions, with spea
 - Splits any segment longer than 15 seconds at the nearest sentence boundary
 - Prints segments with speaker, start/end time, and text
 - Supports a wide range of source and target languages
+- Configurable pause length and minimum words per segment
+- Optional speaker label formatting with brackets
+- Ability to skip punctuation-only segments
 
 ## Supported Languages
 
@@ -43,6 +46,13 @@ After installation, run the aligner on a transcription JSON file:
 aligner sample/transcription.json
 ```
 
+Key options:
+
+- `--big-pause-seconds` – pause length that starts a new segment.
+- `--min-words-in-segment` – minimum number of words in a segment.
+- `--speaker-brackets` – prefix SRT lines with `[Speaker]`.
+- `--skip-punctuation-only` – remove segments that contain only punctuation.
+
 ### As a Script
 You can also run the script directly:
 ```bash
@@ -50,7 +60,7 @@ python aligner.py sample/transcription.json
 ```
 
 ### Sample Data
-A sample transcription file is provided in the `sample/` directory. The file must include a `language_code` key (ISO 639-3 code, e.g., `"deu"` for German).
+A sample transcription file is provided in the `sample/` directory. The file must include a `language_code` key. Both ISO 639-3 codes (e.g., `"deu"`) and ISO 639-1 codes (e.g., `"de"`) are accepted.
 
 ## How It Works
 - **Initial Grouping:** Words are grouped by pauses and speaker changes.

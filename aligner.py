@@ -33,14 +33,56 @@ ISO_TO_NLTK_LANG = {
     "urd": "english",  # Urdu fallback
 }
 
+# Map ISO 639-1 codes to ISO 639-3 for convenience
+ISO1_TO_ISO3 = {
+    "en": "eng",
+    "es": "spa",
+    "pt": "por",
+    "fr": "fra",
+    "de": "deu",
+    "it": "ita",
+    "nl": "nld",
+    "zh": "cmn",
+    "ko": "kor",
+    "ar": "ara",
+    "hi": "hin",
+    "bn": "ben",
+    "ta": "tam",
+    "te": "tel",
+    "mr": "mar",
+    "gu": "guj",
+    "kn": "kan",
+    "pa": "pan",
+    "ml": "mal",
+    "ur": "urd",
+}
 
-def initial_grouping(words: List[Dict]) -> List[List[Dict]]:
+
+def normalize_language_code(code: str) -> str:
+    """Return a 639-3 language code given 639-1 or 639-3 input."""
+    if not code:
+        return "eng"
+    code = code.lower()
+    if len(code) == 2:
+        return ISO1_TO_ISO3.get(code, "eng")
+    return code
+
+
+def initial_grouping(
+    words: List[Dict],
+    big_pause_seconds: float = BIG_PAUSE_SECONDS,
+    min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
+) -> List[List[Dict]]:
+    """Group words by pauses and speaker changes."""
+
     segments = []
+    if not words:
+        return segments
     current_segment = [words[0]]
 
     for word in words[1:]:
         if (
-            word["start"] - current_segment[-1]["end"] > BIG_PAUSE_SECONDS
+            word["start"] - current_segment[-1]["end"] > big_pause_seconds
             or word["speaker_id"] != current_segment[-1]["speaker_id"]
         ):
             segments.append(current_segment)
@@ -50,7 +92,7 @@ def initial_grouping(words: List[Dict]) -> List[List[Dict]]:
     segments.append(current_segment)
 
     # Ensure no segments are too short
-    if len(segments[-1]) < MIN_WORDS_IN_SEGMENT and len(segments) > 1:
+    if len(segments[-1]) < min_words_in_segment and len(segments) > 1:
         segments[-2].extend(segments.pop())
 
     return segments
@@ -168,34 +210,79 @@ def split_long_segments_on_sentence(
     return new_segments
 
 
+def remove_punctuation_only_segments(segments: List[List[Dict]]) -> List[List[Dict]]:
+    """Remove segments consisting solely of punctuation."""
+    import string
+
+    cleaned = []
+    for seg in segments:
+        text = "".join(w["text"] for w in seg)
+        if all(ch in string.punctuation for ch in text):
+            if cleaned:
+                cleaned[-1].extend(seg)
+        else:
+            cleaned.append(seg)
+    return cleaned
+
+
 def load_json(file_path: str) -> Dict:
     with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def print_segments(segments: List[List[Dict]]):
+def print_segments(
+    segments: List[List[Dict]],
+    speaker_brackets: bool = False,
+    speaker_map: Dict[str, str] | None = None,
+) -> None:
+    """Pretty-print segments."""
+
     for i, segment in enumerate(segments, 1):
         text = " ".join(word["text"] for word in segment)
         start = segment[0]["start"]
         end = segment[-1]["end"]
         speaker = segment[0]["speaker_id"]
-        print(f"Segment {i}: [{speaker}] ({start:.2f}-{end:.2f})\n{text}\n")
+        if speaker_map:
+            speaker = speaker_map.get(speaker, speaker)
+        label = f"[{speaker}]" if speaker_brackets else speaker
+        print(f"Segment {i}: {label} ({start:.2f}-{end:.2f})\n{text}\n")
 
 
-def get_grouped_segments(words: List[Dict], language_code: str = "eng", max_duration: float = 15.0) -> List[List[Dict]]:
-    """
-    Returns grouped segments (list of list of word dicts) using the aligner logic.
-    """
-    initial_segments = initial_grouping(words)
-    split_segments = split_long_segments_on_sentence(initial_segments, max_duration=max_duration, language_code=language_code)
-    final_segments = merge_on_sentence_boundary(split_segments, language_code=language_code)
+def get_grouped_segments(
+    words: List[Dict],
+    language_code: str = "eng",
+    max_duration: float = 15.0,
+    big_pause_seconds: float = BIG_PAUSE_SECONDS,
+    min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
+    skip_punctuation_only: bool = False,
+) -> List[List[Dict]]:
+    """Return grouped segments using the aligner logic."""
+
+    lang_code = normalize_language_code(language_code)
+
+    initial_segments = initial_grouping(
+        words,
+        big_pause_seconds=big_pause_seconds,
+        min_words_in_segment=min_words_in_segment,
+    )
+    split_segments = split_long_segments_on_sentence(
+        initial_segments, max_duration=max_duration, language_code=lang_code
+    )
+    final_segments = merge_on_sentence_boundary(
+        split_segments, language_code=lang_code
+    )
+    if skip_punctuation_only:
+        final_segments = remove_punctuation_only_segments(final_segments)
     return final_segments
 
 
-def save_segments_as_srt(segments: List[List[Dict]], filepath: str):
-    """
-    Save segments as an SRT file.
-    """
+def save_segments_as_srt(
+    segments: List[List[Dict]],
+    filepath: str,
+    speaker_brackets: bool = False,
+    speaker_map: Dict[str, str] | None = None,
+) -> None:
+    """Save segments as an SRT file."""
     def format_time(seconds):
         h = int(seconds // 3600)
         m = int((seconds % 3600) // 60)
@@ -205,10 +292,14 @@ def save_segments_as_srt(segments: List[List[Dict]], filepath: str):
 
     with open(filepath, "w", encoding="utf-8") as f:
         for idx, segment in enumerate(segments, 1):
-            start = format_time(segment[0]['start'])
-            end = format_time(segment[-1]['end'])
-            text = " ".join(w['text'] for w in segment)
-            f.write(f"{idx}\n{start} --> {end}\n{text}\n\n")
+            start = format_time(segment[0]["start"])
+            end = format_time(segment[-1]["end"])
+            text = " ".join(w["text"] for w in segment)
+            speaker = segment[0]["speaker_id"]
+            if speaker_map:
+                speaker = speaker_map.get(speaker, speaker)
+            label = f"[{speaker}] " if speaker_brackets else ""
+            f.write(f"{idx}\n{start} --> {end}\n{label}{text}\n\n")
 
 
 # Add a main() function for pip install entry point
@@ -226,19 +317,44 @@ def main():
         default="transcription.json",
         help="Path to transcription JSON file",
     )
+    parser.add_argument(
+        "--big-pause-seconds",
+        type=float,
+        default=BIG_PAUSE_SECONDS,
+        help="Pause length to start a new segment",
+    )
+    parser.add_argument(
+        "--min-words-in-segment",
+        type=int,
+        default=MIN_WORDS_IN_SEGMENT,
+        help="Minimum number of words in a segment",
+    )
+    parser.add_argument(
+        "--speaker-brackets",
+        action="store_true",
+        help="Include speaker label in brackets in output",
+    )
+    parser.add_argument(
+        "--skip-punctuation-only",
+        action="store_true",
+        help="Skip segments that consist only of punctuation",
+    )
     args = parser.parse_args()
 
     transcription = load_json(args.transcription_json)
     words = transcription["words"]
     language_code = transcription.get("language_code", "eng")
-    initial_segments = initial_grouping(words)
-    split_segments = split_long_segments_on_sentence(
-        initial_segments, max_duration=15.0, language_code=language_code
+    segments = get_grouped_segments(
+        words,
+        language_code=language_code,
+        big_pause_seconds=args.big_pause_seconds,
+        min_words_in_segment=args.min_words_in_segment,
+        skip_punctuation_only=args.skip_punctuation_only,
     )
-    final_segments = merge_on_sentence_boundary(
-        split_segments, language_code=language_code
+    print_segments(
+        segments,
+        speaker_brackets=args.speaker_brackets,
     )
-    print_segments(final_segments)
 
 
 if __name__ == "__main__":
