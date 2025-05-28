@@ -272,7 +272,7 @@ def load_json(file_path: str) -> Dict:
 def print_segments(
     segments: List[List[Dict]],
     speaker_brackets: bool = False,
-    speaker_map: Union[Dict[str, str], None] = None,
+    speaker_map: Optional[Dict[str, str]] = None,
 ) -> None:
     """
     Pretty-print segments with speaker, time, and text.
