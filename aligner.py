@@ -342,7 +342,7 @@ def segment_transcription(
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     max_duration: float = 15.0,
-    language_code: Union[str, None] = None,
+    language_code: Optional[str] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
 ) -> List[Dict]:
