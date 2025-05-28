@@ -1,0 +1,1555 @@
+{
+  "language_code": "deu",
+  "language_probability": 0.998885989189148,
+  "text": "Nahezu alle Modelle der Marken BMW und BMW M stehen zur Verf\u00fcgung. Vom 2er bis hin zum M High-Performance-Modell. Los geht's auf einem kleinen Rundkurs. Was ist der erste Eindruck des Profis? Wenn ich jetzt nicht w\u00fcsste, dass es ein Turbomotor ist, hat er f\u00fcr mich eigentlich die Eigenschaften wie ein Saugmotor. Sprich, je mehr Drehzahler, desto mehr Leistung gibt er frei. Von dem her h\u00e4tte ich erwartet, dass er unter raus ein bisschen spritziger ist. Wenn ich das mit meinem1er M Coup\u00e9 vergleiche, der ist unter raus doch viel fr\u00fcher da. Aber wenn dann die Leistung einsetzt, dann zieht er dann am 1er M Coup\u00e9 locker vorbei. Der M2 ist mit einem spezifischen K\u00fchlsystem mit gro\u00dfen \u00d6ffnungen in der Frontsch\u00fcrze ausgestattet. Das stellt optimale Betriebstemperatur des Antriebs im Hochleistungsbetrieb sicher. Auch die \u00d6lversorgung ist f\u00fcr den Renneinsatz optimiert. Daf\u00fcr sorgen zum Beispiel eine \u00d6lwanne mit zwei getrennten Kammern und eine zus\u00e4tzliche Saugstufe der \u00d6lpumpe. Und Olli entwickelt sichtlich Spa\u00df. Das ist schon gut, oder? Und? Wie ist es? Absolut geil. Ist gut? Ja. Ist das geil. So, der macht richtig Spa\u00df. Auf der Bremse ist er heftig, wenn man die Kurve ran bremst und denkt: \u201eJetzt bin ich doch ein bisschen zu schnell, und gibt noch ein bisschen, wo ich eigentlich vorausgehe, dass das ABS arbeitet. Das arbeitet noch nicht. Also der verz\u00f6gert so brutal, denkt der Reifer mit nat\u00fcrlich auch. Aber das ist schon... Also das kenne ich von meinen \u00e4lteren M-Modelle, die sie ja sicherlich nicht verstecken brauchen. Darum bin ich das nicht so gewohnt.",
+  "words": [
+    {
+      "text": "Nahezu",
+      "start": 0.359,
+      "end": 0.779,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "alle",
+      "start": 0.839,
+      "end": 1.039,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Modelle",
+      "start": 1.079,
+      "end": 1.519,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "der",
+      "start": 1.519,
+      "end": 1.659,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Marken",
+      "start": 1.719,
+      "end": 2.019,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "B.M.W.",
+      "start": 2.099,
+      "end": 2.619,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "und",
+      "start": 2.659,
+      "end": 2.839,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "B.M.W.",
+      "start": 2.939,
+      "end": 3.38,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "M",
+      "start": 3.48,
+      "end": 3.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "stehen",
+      "start": 3.72,
+      "end": 3.979,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "zur",
+      "start": 4.0,
+      "end": 4.139,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Verf\u00fcgung.",
+      "start": 4.159,
+      "end": 4.799,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Vom",
+      "start": 5.539,
+      "end": 5.699,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "2er",
+      "start": 5.799,
+      "end": 6.259,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "bis",
+      "start": 6.259,
+      "end": 6.459,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "hin",
+      "start": 6.46,
+      "end": 6.659,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "zum",
+      "start": 6.659,
+      "end": 6.879,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "M",
+      "start": 7.039,
+      "end": 7.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "High-Performance-Modell.",
+      "start": 7.359,
+      "end": 8.699,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Los",
+      "start": 12.319,
+      "end": 12.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "geht's",
+      "start": 12.679,
+      "end": 13.019,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "auf",
+      "start": 13.019,
+      "end": 13.179,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "einem",
+      "start": 13.199,
+      "end": 13.46,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "kleinen",
+      "start": 13.5,
+      "end": 13.88,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Rundkurs.",
+      "start": 13.92,
+      "end": 14.679,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Was",
+      "start": 15.899,
+      "end": 16.179,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "ist",
+      "start": 16.199,
+      "end": 16.359,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "der",
+      "start": 16.379,
+      "end": 16.46,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "erste",
+      "start": 16.52,
+      "end": 16.779,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Eindruck",
+      "start": 16.799,
+      "end": 17.139,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "des",
+      "start": 17.139,
+      "end": 17.299,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Profis?",
+      "start": 17.359,
+      "end": 17.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "text": "Wenn",
+      "start": 23.699,
+      "end": 25.399,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 25.459,
+      "end": 25.579,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "jetzt",
+      "start": 25.599,
+      "end": 25.92,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "nicht",
+      "start": 26.019,
+      "end": 26.359,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "w\u00fcsste,",
+      "start": 26.719,
+      "end": 27.219,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dass",
+      "start": 27.219,
+      "end": 27.42,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "es",
+      "start": 27.439,
+      "end": 27.579,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ein",
+      "start": 27.579,
+      "end": 27.68,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Turbomotor",
+      "start": 27.719,
+      "end": 28.46,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist,",
+      "start": 28.539,
+      "end": 28.959,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "hat",
+      "start": 29.42,
+      "end": 29.579,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "er",
+      "start": 29.599,
+      "end": 29.699,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "f\u00fcr",
+      "start": 29.699,
+      "end": 29.839,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "mich",
+      "start": 29.879,
+      "end": 30.04,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "eigentlich",
+      "start": 30.099,
+      "end": 30.339,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "die",
+      "start": 30.34,
+      "end": 30.459,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Eigenschaften",
+      "start": 30.479,
+      "end": 31.099,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "wie",
+      "start": 31.119,
+      "end": 31.219,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ein",
+      "start": 31.219,
+      "end": 31.319,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Saugmotor.",
+      "start": 31.359,
+      "end": 32.139,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Sprich,",
+      "start": 32.479,
+      "end": 32.819,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "je",
+      "start": 32.819,
+      "end": 32.92,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "mehr",
+      "start": 32.959,
+      "end": 33.119,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Drehzahler,",
+      "start": 33.139,
+      "end": 34.039,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "desto",
+      "start": 34.059,
+      "end": 34.479,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "mehr",
+      "start": 34.5,
+      "end": 34.759,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Leistung",
+      "start": 35.38,
+      "end": 35.799,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "gibt",
+      "start": 35.819,
+      "end": 36.02,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "er",
+      "start": 36.04,
+      "end": 36.18,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "frei.",
+      "start": 36.2,
+      "end": 36.639,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Von",
+      "start": 37.18,
+      "end": 37.299,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dem",
+      "start": 37.319,
+      "end": 37.459,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "her",
+      "start": 37.459,
+      "end": 37.76,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "h\u00e4tte",
+      "start": 38.059,
+      "end": 38.5,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 38.5,
+      "end": 38.579,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "erwartet,",
+      "start": 38.599,
+      "end": 38.959,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dass",
+      "start": 38.959,
+      "end": 39.099,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "er",
+      "start": 39.099,
+      "end": 39.219,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "unter",
+      "start": 39.219,
+      "end": 39.559,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "raus",
+      "start": 39.559,
+      "end": 39.799,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ein",
+      "start": 39.799,
+      "end": 39.919,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "bisschen",
+      "start": 39.919,
+      "end": 40.139,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "spritziger",
+      "start": 40.159,
+      "end": 40.76,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist.",
+      "start": 40.799,
+      "end": 41.159,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Wenn",
+      "start": 41.2,
+      "end": 41.319,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 41.34,
+      "end": 41.419,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "das",
+      "start": 41.439,
+      "end": 41.619,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "mit",
+      "start": 41.639,
+      "end": 41.779,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "meinem1er",
+      "start": 41.799,
+      "end": 42.36,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "M",
+      "start": 42.419,
+      "end": 42.539,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Coup\u00e9",
+      "start": 42.559,
+      "end": 42.899,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "vergleiche,",
+      "start": 42.939,
+      "end": 43.4,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "der",
+      "start": 43.419,
+      "end": 43.52,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist",
+      "start": 43.52,
+      "end": 43.719,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "unter",
+      "start": 43.719,
+      "end": 44.0,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "raus",
+      "start": 44.0,
+      "end": 44.279,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "doch",
+      "start": 44.299,
+      "end": 44.479,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "viel",
+      "start": 44.539,
+      "end": 44.72,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "fr\u00fcher",
+      "start": 44.779,
+      "end": 45.08,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "da.",
+      "start": 45.119,
+      "end": 45.459,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Aber",
+      "start": 46.2,
+      "end": 46.439,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "wenn",
+      "start": 46.459,
+      "end": 46.619,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dann",
+      "start": 46.639,
+      "end": 46.799,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "die",
+      "start": 46.84,
+      "end": 46.919,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Leistung",
+      "start": 46.939,
+      "end": 47.38,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "einsetzt,",
+      "start": 47.399,
+      "end": 48.02,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dann",
+      "start": 48.02,
+      "end": 48.299,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "zieht",
+      "start": 49.68,
+      "end": 49.899,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "er",
+      "start": 49.899,
+      "end": 50.0,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dann",
+      "start": 50.0,
+      "end": 50.18,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "am",
+      "start": 50.18,
+      "end": 50.319,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "1er",
+      "start": 50.319,
+      "end": 50.659,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "M",
+      "start": 50.659,
+      "end": 50.819,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Coup\u00e9",
+      "start": 50.86,
+      "end": 51.199,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "locker",
+      "start": 51.219,
+      "end": 51.459,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "vorbei.",
+      "start": 51.5,
+      "end": 51.96,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Der",
+      "start": 53.299,
+      "end": 54.08,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "M2",
+      "start": 54.159,
+      "end": 54.639,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "ist",
+      "start": 54.659,
+      "end": 54.84,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "mit",
+      "start": 54.86,
+      "end": 55.039,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "einem",
+      "start": 55.059,
+      "end": 55.259,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "spezifischen",
+      "start": 55.299,
+      "end": 55.939,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "K\u00fchlsystem",
+      "start": 56.02,
+      "end": 56.739,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "mit",
+      "start": 56.799,
+      "end": 56.959,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "gro\u00dfen",
+      "start": 56.959,
+      "end": 57.34,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "\u00d6ffnungen",
+      "start": 57.379,
+      "end": 57.839,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "in",
+      "start": 57.879,
+      "end": 57.959,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "der",
+      "start": 57.979,
+      "end": 58.079,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Frontsch\u00fcrze",
+      "start": 58.139,
+      "end": 58.7,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "ausgestattet.",
+      "start": 58.739,
+      "end": 59.52,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Das",
+      "start": 60.419,
+      "end": 60.619,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "stellt",
+      "start": 60.639,
+      "end": 60.939,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "optimale",
+      "start": 60.979,
+      "end": 61.5,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Betriebstemperatur",
+      "start": 61.539,
+      "end": 62.459,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "des",
+      "start": 62.459,
+      "end": 62.639,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Antriebs",
+      "start": 62.699,
+      "end": 63.219,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "im",
+      "start": 63.299,
+      "end": 63.459,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Hochleistungsbetrieb",
+      "start": 63.52,
+      "end": 64.539,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "sicher.",
+      "start": 64.559,
+      "end": 64.98,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Auch",
+      "start": 66.119,
+      "end": 66.339,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "die",
+      "start": 66.339,
+      "end": 66.519,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "\u00d6lversorgung",
+      "start": 66.559,
+      "end": 67.38,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "ist",
+      "start": 67.459,
+      "end": 67.639,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "f\u00fcr",
+      "start": 67.659,
+      "end": 67.779,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "den",
+      "start": 67.799,
+      "end": 67.919,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Renneinsatz",
+      "start": 67.959,
+      "end": 68.54,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "optimiert.",
+      "start": 68.54,
+      "end": 69.199,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Daf\u00fcr",
+      "start": 69.879,
+      "end": 70.239,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "sorgen",
+      "start": 70.299,
+      "end": 70.599,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "zum",
+      "start": 70.639,
+      "end": 70.779,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Beispiel",
+      "start": 70.799,
+      "end": 71.22,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "eine",
+      "start": 71.299,
+      "end": 71.48,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "\u00d6lwanne",
+      "start": 71.559,
+      "end": 72.119,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "mit",
+      "start": 72.36,
+      "end": 72.519,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "zwei",
+      "start": 72.559,
+      "end": 72.76,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "getrennten",
+      "start": 72.779,
+      "end": 73.199,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Kammern",
+      "start": 73.239,
+      "end": 73.619,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "und",
+      "start": 74.18,
+      "end": 74.34,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "eine",
+      "start": 74.36,
+      "end": 74.559,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "zus\u00e4tzliche",
+      "start": 74.639,
+      "end": 75.199,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Saugstufe",
+      "start": 75.279,
+      "end": 75.9,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "der",
+      "start": 75.919,
+      "end": 76.04,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "\u00d6lpumpe.",
+      "start": 76.099,
+      "end": 76.8,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Und",
+      "start": 77.699,
+      "end": 77.839,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Olli",
+      "start": 77.9,
+      "end": 78.199,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "entwickelt",
+      "start": 78.4,
+      "end": 78.819,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "sichtlich",
+      "start": 78.819,
+      "end": 79.179,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Spa\u00df.",
+      "start": 79.199,
+      "end": 79.759,
+      "speaker_id": "speaker_2"
+    },
+    {
+      "text": "Das",
+      "start": 82.839,
+      "end": 83.86,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist",
+      "start": 83.86,
+      "end": 83.979,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "schon",
+      "start": 83.979,
+      "end": 84.259,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "gut,",
+      "start": 84.259,
+      "end": 84.519,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "oder?",
+      "start": 84.54,
+      "end": 84.86,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Und?",
+      "start": 86.419,
+      "end": 86.439,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Wie",
+      "start": 86.439,
+      "end": 91.439,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist",
+      "start": 91.459,
+      "end": 91.619,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "es?",
+      "start": 91.619,
+      "end": 91.96,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Absolut",
+      "start": 92.0,
+      "end": 92.879,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "geil.",
+      "start": 92.939,
+      "end": 93.319,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "Ist",
+      "start": 93.339,
+      "end": 93.359,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "gut?",
+      "start": 93.36,
+      "end": 93.739,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "Ja.",
+      "start": 95.759,
+      "end": 96.679,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "Ist",
+      "start": 105.72,
+      "end": 106.0,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "das",
+      "start": 106.04,
+      "end": 106.239,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "geil.",
+      "start": 106.279,
+      "end": 106.719,
+      "speaker_id": "speaker_3"
+    },
+    {
+      "text": "So,",
+      "start": 110.819,
+      "end": 111.599,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "der",
+      "start": 111.599,
+      "end": 111.699,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "macht",
+      "start": 111.739,
+      "end": 111.959,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "richtig",
+      "start": 112.0,
+      "end": 112.379,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Spa\u00df.",
+      "start": 112.419,
+      "end": 112.919,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Auf",
+      "start": 113.439,
+      "end": 113.619,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "der",
+      "start": 113.639,
+      "end": 113.739,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Bremse",
+      "start": 113.799,
+      "end": 114.36,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist",
+      "start": 114.919,
+      "end": 115.099,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "er",
+      "start": 115.099,
+      "end": 115.259,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "heftig,",
+      "start": 115.299,
+      "end": 115.979,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "wenn",
+      "start": 116.439,
+      "end": 116.599,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "man",
+      "start": 116.619,
+      "end": 116.919,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "die",
+      "start": 119.04,
+      "end": 119.159,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Kurve",
+      "start": 119.18,
+      "end": 119.499,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ran",
+      "start": 119.559,
+      "end": 119.779,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "bremst",
+      "start": 119.799,
+      "end": 120.139,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "und",
+      "start": 120.18,
+      "end": 120.259,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "denkt:",
+      "start": 120.279,
+      "end": 120.479,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "\u201eJetzt",
+      "start": 120.479,
+      "end": 120.839,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "bin",
+      "start": 120.86,
+      "end": 120.979,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 121.0,
+      "end": 121.079,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "doch",
+      "start": 121.079,
+      "end": 121.239,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ein",
+      "start": 121.239,
+      "end": 121.36,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "bisschen",
+      "start": 121.36,
+      "end": 121.54,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "zu",
+      "start": 121.579,
+      "end": 121.699,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "schnell,",
+      "start": 121.739,
+      "end": 122.159,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "und",
+      "start": 122.279,
+      "end": 122.5,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "gibt",
+      "start": 123.099,
+      "end": 123.339,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "noch",
+      "start": 123.36,
+      "end": 123.5,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ein",
+      "start": 123.5,
+      "end": 123.639,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "bisschen,",
+      "start": 123.659,
+      "end": 124.079,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "wo",
+      "start": 124.18,
+      "end": 124.319,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 124.399,
+      "end": 124.519,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "eigentlich",
+      "start": 124.54,
+      "end": 124.819,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "vorausgehe,",
+      "start": 124.899,
+      "end": 125.439,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "dass",
+      "start": 125.439,
+      "end": 125.619,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "das",
+      "start": 125.639,
+      "end": 126.059,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "A.B.S.",
+      "start": 126.079,
+      "end": 126.5,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "arbeitet.",
+      "start": 126.54,
+      "end": 127.179,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Das",
+      "start": 128.0,
+      "end": 128.18,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "arbeitet",
+      "start": 128.22,
+      "end": 128.699,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "noch",
+      "start": 128.739,
+      "end": 128.88,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "nicht.",
+      "start": 128.919,
+      "end": 129.259,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Also",
+      "start": 129.259,
+      "end": 129.5,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "der",
+      "start": 129.5,
+      "end": 129.74,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "verz\u00f6gert",
+      "start": 129.819,
+      "end": 130.44,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "so",
+      "start": 130.5,
+      "end": 130.66,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "brutal,",
+      "start": 130.679,
+      "end": 131.299,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "denkt",
+      "start": 131.52,
+      "end": 131.919,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "der",
+      "start": 131.919,
+      "end": 132.1,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Reifer",
+      "start": 132.539,
+      "end": 132.88,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "mit",
+      "start": 132.899,
+      "end": 133.099,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "nat\u00fcrlich",
+      "start": 133.139,
+      "end": 133.579,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "auch.",
+      "start": 133.619,
+      "end": 133.899,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Aber",
+      "start": 134.66,
+      "end": 134.879,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "das",
+      "start": 134.919,
+      "end": 135.079,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ist",
+      "start": 135.099,
+      "end": 135.259,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "schon...",
+      "start": 135.259,
+      "end": 135.699,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Also",
+      "start": 135.699,
+      "end": 135.86,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "das",
+      "start": 135.86,
+      "end": 136.02,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "kenne",
+      "start": 136.02,
+      "end": 136.199,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 136.199,
+      "end": 136.279,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "von",
+      "start": 136.319,
+      "end": 136.479,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "meinen",
+      "start": 136.479,
+      "end": 136.759,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "\u00e4lteren",
+      "start": 136.779,
+      "end": 137.179,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "M-Modelle,",
+      "start": 137.22,
+      "end": 137.799,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "die",
+      "start": 137.819,
+      "end": 137.919,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "sie",
+      "start": 137.94,
+      "end": 138.059,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ja",
+      "start": 138.059,
+      "end": 138.219,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "sicherlich",
+      "start": 138.22,
+      "end": 138.619,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "nicht",
+      "start": 138.639,
+      "end": 138.879,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "verstecken",
+      "start": 139.099,
+      "end": 139.52,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "brauchen.",
+      "start": 139.52,
+      "end": 140.019,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "Darum",
+      "start": 140.5,
+      "end": 140.779,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "bin",
+      "start": 140.839,
+      "end": 140.939,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "ich",
+      "start": 140.959,
+      "end": 141.019,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "das",
+      "start": 141.059,
+      "end": 141.179,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "nicht",
+      "start": 141.179,
+      "end": 141.339,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "so",
+      "start": 141.339,
+      "end": 141.5,
+      "speaker_id": "speaker_1"
+    },
+    {
+      "text": "gewohnt.",
+      "start": 141.5,
+      "end": 141.96,
+      "speaker_id": "speaker_1"
+    }
+  ]
+}

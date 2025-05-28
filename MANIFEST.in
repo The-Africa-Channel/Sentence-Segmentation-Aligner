@@ -1,0 +1,7 @@
+include aligner.py
+include requirements.txt
+include README.md
+include setup.py
+include test_aligner.py
+include run_sample.py
+recursive-include sample *.json
