@@ -1,6 +1,6 @@
 import json
 import nltk
-from typing import List, Dict
+from typing import List, Dict, Union
 from nltk.tokenize import sent_tokenize
 
 # Ensure you have the tokenizer downloaded
@@ -353,6 +353,78 @@ def get_grouped_segments(
     if skip_punctuation_only:
         final_segments = remove_punctuation_only_segments(final_segments)
     return final_segments
+
+
+def segment_transcription(
+    transcription: Union[str, Dict],
+    *,
+    big_pause_seconds: float = BIG_PAUSE_SECONDS,
+    min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
+    language_code: str | None = None,
+    speaker_brackets: bool = False,
+    skip_punctuation_only: bool = False,
+) -> List[Dict]:
+    """Segment a transcription JSON and return clean segment dictionaries.
+
+    Args:
+        transcription: Either a path to a transcription JSON file or a parsed
+            transcription dictionary. The dictionary must contain a ``words``
+            list with ``text``, ``start``, ``end`` and ``speaker_id`` fields.
+        big_pause_seconds: Pause in seconds that triggers a new segment.
+        min_words_in_segment: Minimum number of words required per segment.
+        language_code: Language code override. If ``None`` the value from the
+            transcription is used.
+        speaker_brackets: If ``True``, speaker labels in the returned segments
+            are formatted as ``- [Speaker]``.
+        skip_punctuation_only: Remove segments that contain only punctuation.
+
+    Returns:
+        A list of dictionaries with ``speaker``, ``start``, ``end`` and ``text``
+        keys.
+
+    Raises:
+        ValueError: If the input is malformed or missing required fields.
+    """
+
+    if isinstance(transcription, str):
+        transcription = load_json(transcription)
+    elif not isinstance(transcription, dict):
+        raise ValueError("transcription must be a dict or file path")
+
+    if "words" not in transcription or not isinstance(transcription["words"], list):
+        raise ValueError("transcription missing required 'words' list")
+
+    words = transcription["words"]
+    required_fields = {"text", "start", "end", "speaker_id"}
+    for w in words:
+        if not required_fields.issubset(w):
+            raise ValueError("each word must contain text, start, end and speaker_id")
+
+    lang = language_code or transcription.get("language_code", "eng")
+
+    grouped = get_grouped_segments(
+        words,
+        language_code=lang,
+        big_pause_seconds=big_pause_seconds,
+        min_words_in_segment=min_words_in_segment,
+        skip_punctuation_only=skip_punctuation_only,
+    )
+
+    results: List[Dict] = []
+    for seg in grouped:
+        speaker = seg[0]["speaker_id"]
+        if speaker_brackets:
+            speaker = f"- [{speaker}]"
+        results.append(
+            {
+                "speaker": speaker,
+                "start": seg[0]["start"],
+                "end": seg[-1]["end"],
+                "text": " ".join(w["text"] for w in seg),
+            }
+        )
+
+    return results
 
 
 def save_segments_as_srt(
