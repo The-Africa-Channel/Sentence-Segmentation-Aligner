@@ -120,7 +120,7 @@ segments = segment_transcription(
     "sample/transcription.json",
     big_pause_seconds=1.0,
     min_words_in_segment=3,
-    max_duration=10.0,  # Example: set max segment duration to 10 seconds
+    max_duration=10.0,  # Example: set duration to size of segment that it will find a breakpoint in punctuation. 
     language_code="en",
     speaker_brackets=True,
     # fix_orphaned_punctuation is True by default
