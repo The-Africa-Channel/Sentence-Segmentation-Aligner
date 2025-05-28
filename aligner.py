@@ -59,7 +59,15 @@ ISO1_TO_ISO3 = {
 
 
 def normalize_language_code(code: str) -> str:
-    """Return a 639-3 language code given 639-1 or 639-3 input."""
+    """
+    Normalize a language code to ISO 639-3 format.
+
+    Args:
+        code: A 2-letter (ISO 639-1) or 3-letter (ISO 639-3) language code.
+
+    Returns:
+        The corresponding 3-letter ISO 639-3 code, or 'eng' if not recognized.
+    """
     if not code:
         return "eng"
     code = code.lower()
@@ -73,7 +81,17 @@ def initial_grouping(
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
 ) -> List[List[Dict]]:
-    """Group words by pauses and speaker changes."""
+    """
+    Group words into segments based on pauses and speaker changes.
+
+    Args:
+        words: List of word dicts, each with 'text', 'start', 'end', and 'speaker_id'.
+        big_pause_seconds: Pause (in seconds) that triggers a new segment if exceeded between words.
+        min_words_in_segment: Minimum number of words in a segment; if the last segment is too short, it is merged with the previous one.
+
+    Returns:
+        List of segments, where each segment is a list of word dicts.
+    """
 
     segments = []
     if not words:
@@ -101,6 +119,17 @@ def initial_grouping(
 def merge_on_sentence_boundary(
     segments: List[List[Dict]], language_code: str = "eng"
 ) -> List[List[Dict]]:
+    """
+    Merge segments on sentence boundaries using NLTK's sentence tokenizer.
+    Handles acronyms to avoid incorrect sentence splits.
+
+    Args:
+        segments: List of segments (each a list of word dicts).
+        language_code: ISO 639-3 language code for sentence tokenization.
+
+    Returns:
+        List of merged segments split at sentence boundaries.
+    """
     import re
     import string
 
@@ -156,6 +185,18 @@ def merge_on_sentence_boundary(
 def split_long_segments_on_sentence(
     segments: List[List[Dict]], max_duration: float = 15.0, language_code: str = "eng"
 ) -> List[List[Dict]]:
+    """
+    Split any segment longer than max_duration at the nearest sentence boundary.
+    Handles acronyms to avoid incorrect sentence splits.
+
+    Args:
+        segments: List of segments (each a list of word dicts).
+        max_duration: Maximum allowed segment duration in seconds.
+        language_code: ISO 639-3 language code for sentence tokenization.
+
+    Returns:
+        List of segments, split so that no segment exceeds max_duration.
+    """
     from nltk.tokenize import sent_tokenize
     import string
     import re
@@ -211,7 +252,15 @@ def split_long_segments_on_sentence(
 
 
 def remove_punctuation_only_segments(segments: List[List[Dict]]) -> List[List[Dict]]:
-    """Remove segments consisting solely of punctuation."""
+    """
+    Remove segments consisting solely of punctuation, merging them with the previous segment if possible.
+
+    Args:
+        segments: List of segments (each a list of word dicts).
+
+    Returns:
+        Cleaned list of segments with punctuation-only segments removed.
+    """
     import string
 
     cleaned = []
@@ -226,6 +275,15 @@ def remove_punctuation_only_segments(segments: List[List[Dict]]) -> List[List[Di
 
 
 def load_json(file_path: str) -> Dict:
+    """
+    Load a JSON file and return its contents as a dictionary.
+
+    Args:
+        file_path: Path to the JSON file.
+
+    Returns:
+        Dictionary with the loaded JSON data.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -235,7 +293,14 @@ def print_segments(
     speaker_brackets: bool = False,
     speaker_map: Dict[str, str] | None = None,
 ) -> None:
-    """Pretty-print segments."""
+    """
+    Pretty-print segments with speaker, time, and text.
+
+    Args:
+        segments: List of segments (each a list of word dicts).
+        speaker_brackets: If True, prefix each segment with '- [Speaker]'.
+        speaker_map: Optional mapping to rename speaker IDs.
+    """
 
     for i, segment in enumerate(segments, 1):
         text = " ".join(word["text"] for word in segment)
@@ -259,7 +324,20 @@ def get_grouped_segments(
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     skip_punctuation_only: bool = False,
 ) -> List[List[Dict]]:
-    """Return grouped segments using the aligner logic."""
+    """
+    Return grouped segments using the aligner logic (pauses, speaker, sentence, duration, punctuation).
+
+    Args:
+        words: List of word dicts, each with 'text', 'start', 'end', and 'speaker_id'.
+        language_code: ISO 639-3 or 639-1 language code for sentence tokenization.
+        max_duration: Maximum allowed segment duration in seconds.
+        big_pause_seconds: Pause (in seconds) that triggers a new segment if exceeded between words.
+        min_words_in_segment: Minimum number of words in a segment.
+        skip_punctuation_only: If True, remove segments that contain only punctuation.
+
+    Returns:
+        List of grouped segments (each a list of word dicts).
+    """
 
     lang_code = normalize_language_code(language_code)
 
@@ -283,7 +361,15 @@ def save_segments_as_srt(
     speaker_brackets: bool = False,
     speaker_map: Dict[str, str] | None = None,
 ) -> None:
-    """Save segments as an SRT file."""
+    """
+    Save segments as an SRT subtitle file.
+
+    Args:
+        segments: List of segments (each a list of word dicts).
+        filepath: Path to the output SRT file.
+        speaker_brackets: If True, prefix each segment with '[Speaker]' in the SRT.
+        speaker_map: Optional mapping to rename speaker IDs.
+    """
 
     def format_time(seconds):
         h = int(seconds // 3600)
@@ -308,6 +394,11 @@ def save_segments_as_srt(
 
 
 def main():
+    """
+    Command-line entry point for running the aligner on a transcription JSON file.
+    Parses arguments, loads data, runs segmentation, and prints results.
+    """
+
     import argparse
 
     parser = argparse.ArgumentParser(
