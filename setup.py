@@ -7,7 +7,7 @@ setup(
     author="Chris Eckman",
     packages=find_packages(),
     py_modules=["aligner"],
-    install_requires=["nltk==3.8.1"],
+    install_requires=[],
     entry_points={"console_scripts": ["aligner=aligner:main"]},
     include_package_data=True,
     python_requires=">=3.7",
