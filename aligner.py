@@ -244,7 +244,10 @@ def print_segments(
         speaker = segment[0]["speaker_id"]
         if speaker_map:
             speaker = speaker_map.get(speaker, speaker)
-        label = f"[{speaker}]" if speaker_brackets else speaker
+        if speaker_brackets:
+            label = f"- [{speaker}]"
+        else:
+            label = speaker
         print(f"Segment {i}: {label} ({start:.2f}-{end:.2f})\n{text}\n")
 
 
@@ -268,9 +271,7 @@ def get_grouped_segments(
     split_segments = split_long_segments_on_sentence(
         initial_segments, max_duration=max_duration, language_code=lang_code
     )
-    final_segments = merge_on_sentence_boundary(
-        split_segments, language_code=lang_code
-    )
+    final_segments = merge_on_sentence_boundary(split_segments, language_code=lang_code)
     if skip_punctuation_only:
         final_segments = remove_punctuation_only_segments(final_segments)
     return final_segments
@@ -283,6 +284,7 @@ def save_segments_as_srt(
     speaker_map: Dict[str, str] | None = None,
 ) -> None:
     """Save segments as an SRT file."""
+
     def format_time(seconds):
         h = int(seconds // 3600)
         m = int((seconds % 3600) // 60)

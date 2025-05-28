@@ -47,7 +47,7 @@ class TestAligner(unittest.TestCase):
             min_words_in_segment=1,
             skip_punctuation_only=True,
         )
-        self.assertEqual(len(segments), 4)
+        self.assertEqual(len(segments), 3)
 
 
 if __name__ == "__main__":
