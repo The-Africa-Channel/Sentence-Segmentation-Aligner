@@ -1,4 +1,3 @@
-
 import json
 import re
 from typing import List, Dict, Union
@@ -273,7 +272,7 @@ def load_json(file_path: str) -> Dict:
 def print_segments(
     segments: List[List[Dict]],
     speaker_brackets: bool = False,
-    speaker_map: Dict[str, str] | None = None,
+    speaker_map: Union[Dict[str, str], None] = None,
 ) -> None:
     """
     Pretty-print segments with speaker, time, and text.
@@ -343,7 +342,7 @@ def segment_transcription(
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     max_duration: float = 15.0,
-    language_code: str | None = None,
+    language_code: Union[str, None] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
 ) -> List[Dict]:
@@ -416,7 +415,7 @@ def save_segments_as_srt(
     segments: List[List[Dict]],
     filepath: str,
     speaker_brackets: bool = False,
-    speaker_map: Dict[str, str] | None = None,
+    speaker_map: Union[Dict[str, str], None] = None,
 ) -> None:
     """
     Save segments as an SRT subtitle file.
