@@ -107,6 +107,82 @@ text...
 
 This preserves the speaker label in brackets as in the JSON, with a hyphen at the front.
 
+### Example SRT Output
+
+When you generate an SRT file using the aligner, the output will look like this:
+
+```
+1
+00:00:00,359 --> 00:00:08,698
+- [speaker_0] Nahezu alle Modelle der Marken B.M.W. und B.M.W. M stehen zur Verfügung. Vom 2er bis hin zum M High-Performance-Modell.
+
+2
+00:00:12,319 --> 00:00:14,679
+- [speaker_0] Los geht's auf einem kleinen Rundkurs.
+
+3
+00:00:15,898 --> 00:00:17,940
+- [speaker_0] Was ist der erste Eindruck des Profis?
+
+4
+00:00:23,699 --> 00:00:32,139
+- [speaker_1] Wenn ich jetzt nicht wüsste, dass es ein Turbomotor ist, hat er für mich eigentlich die Eigenschaften wie ein Saugmotor.
+
+5
+00:00:32,478 --> 00:00:36,639
+- [speaker_1] Sprich, je mehr Drehzahler, desto mehr Leistung gibt er frei.
+
+6
+00:00:37,179 --> 00:00:41,158
+- [speaker_1] Von dem her hätte ich erwartet, dass er unter raus ein bisschen spritziger ist.
+
+7
+00:00:41,200 --> 00:00:45,459
+- [speaker_1] Wenn ich das mit meinem1er M Coupé vergleiche, der ist unter raus doch viel früher da.
+```
+
+Each segment includes the segment number, start and end timestamps, and the speaker label with a hyphen prefix, followed by the segment text.
+
+### Python Example: SRT Generation
+
+You can generate an SRT file using the Python API as follows:
+
+```python
+from aligner import segment_transcription, save_segments_as_srt, get_grouped_segments
+import os
+import json
+
+SAMPLE_JSON = os.path.join(os.path.dirname(__file__), "sample", "transcription.json")
+SRT_PATH = os.path.join(os.path.dirname(__file__), "sample", "transcription.srt")
+
+# Segment the transcription (flat output for printing)
+segments = segment_transcription(
+    SAMPLE_JSON,
+    speaker_brackets=True,
+    max_duration=15.0,
+    big_pause_seconds=0.75,
+    min_words_in_segment=2,
+)
+
+# Print segments (optional)
+for i, seg in enumerate(segments, 1):
+    print(f"Segment {i}: {seg['speaker']} ({seg['start']:.2f}-{seg['end']:.2f})\n{seg['text']}\n")
+
+# For SRT, re-segment as list of lists of word dicts
+with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
+    words = json.load(f)["words"]
+segments_for_srt = get_grouped_segments(
+    words,
+    max_duration=15.0,
+    big_pause_seconds=0.75,
+    min_words_in_segment=2,
+)
+save_segments_as_srt(segments_for_srt, SRT_PATH, speaker_brackets=True)
+print(f"SRT file saved to: {SRT_PATH}")
+```
+
+This will create an SRT file with the format shown above.
+
 ### Python API Usage
 
 You can also use the aligner directly from Python. Import
