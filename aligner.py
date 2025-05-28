@@ -512,9 +512,9 @@ def main():
         help="Include speaker label in brackets in output",
     )
     parser.add_argument(
-        "--skip-punctuation-only",
+        "--fix-orphaned-punctuation",
         action="store_true",
-        help="Skip segments that consist only of punctuation",
+        help="Merge segments that contain only punctuation into the previous segment (default behavior)",
     )
     args = parser.parse_args()
 
@@ -527,7 +527,7 @@ def main():
         big_pause_seconds=args.big_pause_seconds,
         min_words_in_segment=args.min_words_in_segment,
         max_duration=args.max_duration,
-        skip_punctuation_only=args.skip_punctuation_only,
+        skip_punctuation_only=args.fix_orphaned_punctuation,
     )
     print_segments(
         segments,
