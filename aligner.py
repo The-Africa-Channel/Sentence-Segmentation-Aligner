@@ -1,6 +1,6 @@
 import json
 import nltk
-from typing import List, Dict
+from typing import List, Dict, Union
 from nltk.tokenize import sent_tokenize
 
 # Ensure you have the tokenizer downloaded
@@ -251,15 +251,15 @@ def split_long_segments_on_sentence(
     return new_segments
 
 
-def remove_punctuation_only_segments(segments: List[List[Dict]]) -> List[List[Dict]]:
+def merge_punctuation_only_segments(segments: List[List[Dict]]) -> List[List[Dict]]:
     """
-    Remove segments consisting solely of punctuation, merging them with the previous segment if possible.
+    Move punctuation-only segments to the end of the previous segment, instead of removing them.
 
     Args:
         segments: List of segments (each a list of word dicts).
 
     Returns:
-        Cleaned list of segments with punctuation-only segments removed.
+        Cleaned list of segments with punctuation-only segments appended to the previous segment.
     """
     import string
 
@@ -269,6 +269,9 @@ def remove_punctuation_only_segments(segments: List[List[Dict]]) -> List[List[Di
         if all(ch in string.punctuation for ch in text):
             if cleaned:
                 cleaned[-1].extend(seg)
+            # If no previous segment, keep as is (edge case)
+            else:
+                cleaned.append(seg)
         else:
             cleaned.append(seg)
     return cleaned
@@ -351,8 +354,83 @@ def get_grouped_segments(
     )
     final_segments = merge_on_sentence_boundary(split_segments, language_code=lang_code)
     if skip_punctuation_only:
-        final_segments = remove_punctuation_only_segments(final_segments)
+        final_segments = merge_punctuation_only_segments(final_segments)
     return final_segments
+
+
+def segment_transcription(
+    transcription: Union[str, Dict],
+    *,
+    big_pause_seconds: float = BIG_PAUSE_SECONDS,
+    min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
+    max_duration: float = 15.0,
+    language_code: str | None = None,
+    speaker_brackets: bool = False,
+    skip_punctuation_only: bool = False,
+) -> List[Dict]:
+    """Segment a transcription JSON and return clean segment dictionaries.
+
+    Args:
+        transcription: Either a path to a transcription JSON file or a parsed
+            transcription dictionary. The dictionary must contain a ``words``
+            list with ``text``, ``start``, ``end`` and ``speaker_id`` fields.
+        big_pause_seconds: Pause in seconds that triggers a new segment.
+        min_words_in_segment: Minimum number of words required per segment.
+        max_duration: Maximum allowed segment duration in seconds.
+        language_code: Language code override. If ``None`` the value from the
+            transcription is used.
+        speaker_brackets: If ``True``, speaker labels in the returned segments
+            are formatted as ``- [Speaker]``.
+        skip_punctuation_only: Remove segments that contain only punctuation.
+
+    Returns:
+        A list of dictionaries with ``speaker``, ``start``, ``end`` and ``text``
+        keys.
+
+    Raises:
+        ValueError: If the input is malformed or missing required fields.
+    """
+
+    if isinstance(transcription, str):
+        transcription = load_json(transcription)
+    elif not isinstance(transcription, dict):
+        raise ValueError("transcription must be a dict or file path")
+
+    if "words" not in transcription or not isinstance(transcription["words"], list):
+        raise ValueError("transcription missing required 'words' list")
+
+    words = transcription["words"]
+    required_fields = {"text", "start", "end", "speaker_id"}
+    for w in words:
+        if not required_fields.issubset(w):
+            raise ValueError("each word must contain text, start, end and speaker_id")
+
+    lang = language_code or transcription.get("language_code", "eng")
+
+    grouped = get_grouped_segments(
+        words,
+        language_code=lang,
+        big_pause_seconds=big_pause_seconds,
+        min_words_in_segment=min_words_in_segment,
+        max_duration=max_duration,
+        skip_punctuation_only=skip_punctuation_only,
+    )
+
+    results: List[Dict] = []
+    for seg in grouped:
+        speaker = seg[0]["speaker_id"]
+        if speaker_brackets:
+            speaker = f"- [{speaker}]"
+        results.append(
+            {
+                "speaker": speaker,
+                "start": seg[0]["start"],
+                "end": seg[-1]["end"],
+                "text": " ".join(w["text"] for w in seg),
+            }
+        )
+
+    return results
 
 
 def save_segments_as_srt(
@@ -423,14 +501,20 @@ def main():
         help="Minimum number of words in a segment",
     )
     parser.add_argument(
+        "--max-duration",
+        type=float,
+        default=15.0,
+        help="Maximum allowed segment duration in seconds before splitting at a sentence boundary",
+    )
+    parser.add_argument(
         "--speaker-brackets",
         action="store_true",
         help="Include speaker label in brackets in output",
     )
     parser.add_argument(
-        "--skip-punctuation-only",
+        "--fix-orphaned-punctuation",
         action="store_true",
-        help="Skip segments that consist only of punctuation",
+        help="Merge segments that contain only punctuation into the previous segment (default behavior)",
     )
     args = parser.parse_args()
 
@@ -442,7 +526,8 @@ def main():
         language_code=language_code,
         big_pause_seconds=args.big_pause_seconds,
         min_words_in_segment=args.min_words_in_segment,
-        skip_punctuation_only=args.skip_punctuation_only,
+        max_duration=args.max_duration,
+        skip_punctuation_only=args.fix_orphaned_punctuation,
     )
     print_segments(
         segments,
