@@ -49,9 +49,10 @@ aligner sample/transcription.json
 Key options:
 
 - `--big-pause-seconds` – pause length that starts a new segment.
-- `--min-words-in-segment` – minimum number of words in a segment.
+- `--min-words-in-segment` – minimum number of words in a segment. If the last segment is shorter than this, it will be merged with the previous segment. This helps avoid very short, unnatural segments at the end of the output.
 - `--speaker-brackets` – prefix lines with `- [Speaker]` (e.g., `- [speaker_1]`).
-- `--skip-punctuation-only` – remove segments that contain only punctuation.
+- `--fix-orphaned-punctuation` – merge segments that contain only punctuation (e.g., '.', '!', '?') into the previous segment. This is enabled by default and results in cleaner, more natural output by ensuring punctuation is attached to the preceding words rather than appearing as a separate segment.
+- `--max-duration` – maximum allowed segment duration in seconds before splitting at a sentence boundary. Segments longer than this will be split at the nearest sentence boundary. Default: 15.0.
 
 ### As a Script
 You can also run the script directly:
@@ -61,6 +62,39 @@ python aligner.py sample/transcription.json
 
 ### Sample Data
 A sample transcription file is provided in the `sample/` directory. The file must include a `language_code` key. Both ISO 639-3 codes (e.g., `"deu"`) and ISO 639-1 codes (e.g., `"de"`) are accepted.
+
+### Sample Transcription JSON Format
+
+The aligner expects a JSON file with a structure similar to the ElevenLabs transcription output. Here is a realistic example (truncated for brevity):
+
+```json
+{
+  "language_code": "deu",
+  "language_probability": 0.998885989189148,
+  "text": "Nahezu alle Modelle der Marken BMW und BMW M stehen zur Verfügung. ...",
+  "words": [
+    {"text": "Nahezu", "start": 0.359, "end": 0.779, "speaker_id": "speaker_0"},
+    {"text": "alle", "start": 0.839, "end": 1.039, "speaker_id": "speaker_0"},
+    {"text": "Modelle", "start": 1.079, "end": 1.519, "speaker_id": "speaker_0"},
+    {"text": "der", "start": 1.519, "end": 1.659, "speaker_id": "speaker_0"},
+    {"text": "Marken", "start": 1.719, "end": 2.019, "speaker_id": "speaker_0"},
+    {"text": "B.M.W.", "start": 2.099, "end": 2.619, "speaker_id": "speaker_0"},
+    {"text": "und", "start": 2.659, "end": 2.839, "speaker_id": "speaker_0"},
+    // ... more word objects ...
+  ]
+}
+```
+
+- `language_code`: (string) ISO 639-1 or 639-3 code for the language.
+- `language_probability`: (float, optional) Confidence score for language detection.
+- `text`: (string) The full transcript as a single string.
+- `words`: (list) Each word is a dictionary with:
+  - `text`: (string) The word or punctuation.
+  - `start`: (float) Start time in seconds.
+  - `end`: (float) End time in seconds.
+  - `speaker_id`: (string) Speaker label or ID.
+
+This format matches the output of ElevenLabs and similar transcription APIs. The aligner requires all four fields for each word in the `words` list.
 
 ### Output Format
 
@@ -86,9 +120,10 @@ segments = segment_transcription(
     "sample/transcription.json",
     big_pause_seconds=1.0,
     min_words_in_segment=3,
+    max_duration=10.0,  # Example: set max segment duration to 10 seconds
     language_code="en",
     speaker_brackets=True,
-    skip_punctuation_only=True,
+    # fix_orphaned_punctuation is True by default
 )
 ```
 
@@ -118,8 +153,14 @@ missing required fields.
 | `load_json(file_path)` | `file_path: str` | `Dict` |
 | `print_segments(segments, speaker_brackets=False, speaker_map=None)` | `segments: List[List[Dict]]` | `None` |
 | `get_grouped_segments(words, language_code='eng', max_duration=15.0, big_pause_seconds=0.75, min_words_in_segment=2, skip_punctuation_only=False)` | `words: List[Dict]` | `List[List[Dict]]` |
-| `segment_transcription(transcription, big_pause_seconds=0.75, min_words_in_segment=2, language_code=None, speaker_brackets=False, skip_punctuation_only=False)` | `transcription: Union[str, Dict]` | `List[Dict]` |
+| `segment_transcription(transcription, big_pause_seconds=0.75, min_words_in_segment=2, max_duration=15.0, language_code=None, speaker_brackets=False, skip_punctuation_only=False)` | `transcription: Union[str, Dict]` | `List[Dict]` |
 | `save_segments_as_srt(segments, filepath, speaker_brackets=False, speaker_map=None)` | `segments: List[List[Dict]]` | `None` |
+
+#### Parameter Details
+
+- **min_words_in_segment**: Controls the minimum number of words required in each segment. If the last segment after grouping is shorter than this value, it will be merged with the previous segment. This prevents the output from ending with a fragment or a single word.
+- **fix_orphaned_punctuation / merge_punctuation_only_segments**: If enabled (default), any segment that contains only punctuation marks (such as '.', '!', '?', etc.) will be merged with the previous segment. This is useful for producing cleaner output, especially when punctuation tokens are separated from words in the input. This behavior is now the default.
+- **max_duration**: Controls the maximum allowed segment duration in seconds. If a segment is longer than this value, it will be split at the nearest sentence boundary. Default is 15.0 seconds.
 
 ### Extensibility
 
