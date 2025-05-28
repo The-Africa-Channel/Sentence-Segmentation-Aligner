@@ -4,7 +4,7 @@ A Python tool for segmenting and aligning sentences in transcriptions, with spea
 
 ## Features
 - Groups words into segments based on pauses and speaker changes
-- Merges segments on sentence boundaries using NLTK, with language-specific rules
+- Merges segments on sentence boundaries using a lightweight tokenizer
 - Prevents sentence splits inside acronyms (e.g., B.M.W., A.B.S.)
 - Splits any segment longer than 15 seconds at the nearest sentence boundary
 - Prints segments with speaker, start/end time, and text
@@ -32,10 +32,6 @@ A Python tool for segmenting and aligning sentences in transcriptions, with spea
 3. Install the package in editable mode:
    ```bash
    pip install -e .
-   ```
-4. Install NLTK data (for Docker, add this to your Dockerfile; for local, run manually):
-   ```bash
-   python -m nltk.downloader punkt
    ```
 
 ## Usage
@@ -254,11 +250,7 @@ domain-specific abbreviations.
 
 ## Requirements
 - Python 3.7+
-- nltk==3.8.1
-- NLTK requires the `punkt` tokenizer data (`python -m nltk.downloader punkt`).
-- Tested on Linux and macOS with Python 3.7+. On minimal Docker images install
-  build tools (e.g., `build-essential`) so that NLTK can compile its optional
-  dependencies.
+- Tested on Linux and macOS with Python 3.7+.
 
 ## Development
 - To run the sample:
@@ -290,17 +282,16 @@ def test_segment_api():
 ```
 
 ## Docker Usage
-If using Docker, add this to your Dockerfile after installing dependencies:
+If using Docker, simply copy the project files and install the package:
 ```dockerfile
-RUN python -m nltk.downloader punkt
+RUN pip install -e .
 ```
 
 ### Deployment Notes
 
 The project supports Python 3.7 and above. Ensure the operating system has the
 standard C++ runtime available (e.g., `libstdc++6` on Debian/Ubuntu). All tests
-are run on Linux containers, but the code should work on any OS where NLTK can
-be installed.
+are run on Linux containers, but the code should work on any OS with Python 3.7+
 
 ### Versioning
 

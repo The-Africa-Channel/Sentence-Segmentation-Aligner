@@ -1,37 +1,20 @@
 import json
-import nltk
-from typing import List, Dict, Union
-from nltk.tokenize import sent_tokenize
+import re
+from typing import List, Dict, Union, Optional
 
-# Ensure you have the tokenizer downloaded
-nltk.download("punkt")
 
+# Constants
 BIG_PAUSE_SECONDS = 0.75
 MIN_WORDS_IN_SEGMENT = 2
 
-# Map ISO 639-3 codes to NLTK language names for supported languages
-ISO_TO_NLTK_LANG = {
-    "eng": "english",
-    "spa": "spanish",
-    "por": "portuguese",
-    "fra": "french",
-    "deu": "german",
-    "ita": "italian",
-    "nld": "dutch",
-    "cmn": "chinese",
-    "kor": "korean",
-    "ara": "arabic",
-    "hin": "english",  # Hindi not natively supported by NLTK, fallback to English
-    "ben": "english",  # Bengali fallback
-    "tam": "english",  # Tamil fallback
-    "tel": "english",  # Telugu fallback
-    "mar": "english",  # Marathi fallback
-    "guj": "english",  # Gujarati fallback
-    "kan": "english",  # Kannada fallback
-    "pan": "english",  # Punjabi fallback
-    "mal": "english",  # Malayalam fallback
-    "urd": "english",  # Urdu fallback
-}
+# Basic sentence tokenizer to avoid heavy dependencies
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?。！？])\s+")
+
+
+def simple_sentence_tokenize(text: str) -> List[str]:
+    """Lightweight sentence tokenizer using regex."""
+    sentences = SENTENCE_SPLIT_RE.split(text)
+    return [s.strip() for s in sentences if s.strip()]
 
 # Map ISO 639-1 codes to ISO 639-3 for convenience
 ISO1_TO_ISO3 = {
@@ -148,14 +131,11 @@ def merge_on_sentence_boundary(
     def restore_acronyms(text):
         return text.replace(ACRONYM_PLACEHOLDER, ".")
 
-    # Get NLTK language name
-    nltk_lang = ISO_TO_NLTK_LANG.get(language_code, "english")
-
     for segment in segments:
         buffer_segment.extend(segment)
         texts = " ".join([w["text"] for w in buffer_segment])
         safe_texts = replace_acronyms(texts)
-        sentences = sent_tokenize(safe_texts, language=nltk_lang)
+        sentences = simple_sentence_tokenize(safe_texts)
         sentences = [restore_acronyms(s) for s in sentences]
 
         if len(sentences) > 1:
@@ -197,7 +177,6 @@ def split_long_segments_on_sentence(
     Returns:
         List of segments, split so that no segment exceeds max_duration.
     """
-    from nltk.tokenize import sent_tokenize
     import string
     import re
 
@@ -213,7 +192,6 @@ def split_long_segments_on_sentence(
     def restore_acronyms(text):
         return text.replace(ACRONYM_PLACEHOLDER, ".")
 
-    nltk_lang = ISO_TO_NLTK_LANG.get(language_code, "english")
     new_segments = []
     for segment in segments:
         start = segment[0]["start"]
@@ -225,7 +203,7 @@ def split_long_segments_on_sentence(
         # Split at sentence boundaries
         texts = " ".join([w["text"] for w in segment])
         safe_texts = replace_acronyms(texts)
-        sentences = sent_tokenize(safe_texts, language=nltk_lang)
+        sentences = simple_sentence_tokenize(safe_texts)
         sentences = [restore_acronyms(s) for s in sentences]
         # Now, walk through words and split at sentence boundaries
         word_iter = iter(segment)
@@ -294,7 +272,7 @@ def load_json(file_path: str) -> Dict:
 def print_segments(
     segments: List[List[Dict]],
     speaker_brackets: bool = False,
-    speaker_map: Dict[str, str] | None = None,
+    speaker_map: Optional[Dict[str, str]] = None,
 ) -> None:
     """
     Pretty-print segments with speaker, time, and text.
@@ -364,7 +342,7 @@ def segment_transcription(
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     max_duration: float = 15.0,
-    language_code: str | None = None,
+    language_code: Optional[str] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
 ) -> List[Dict]:
@@ -437,7 +415,7 @@ def save_segments_as_srt(
     segments: List[List[Dict]],
     filepath: str,
     speaker_brackets: bool = False,
-    speaker_map: Dict[str, str] | None = None,
+    speaker_map: Union[Dict[str, str], None] = None,
 ) -> None:
     """
     Save segments as an SRT subtitle file.
