@@ -1,0 +1,81 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        # Also test with lambda extras for compatibility
+        pip install -e .[lambda]
+    
+    - name: Run tests
+      run: |
+        python -m pytest test_aligner.py -v
+    
+    - name: Test CLI functionality
+      run: |
+        python aligner.py --help
+        # Test with sample data if available
+        if [ -f "sample/transcription.json" ]; then
+          python aligner.py sample/transcription.json --output sample_output.srt --format srt
+        fi
+    
+    - name: Test example usage
+      run: |
+        python example_usage.py
+
+  lambda-compatibility:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.9 (Lambda compatible)
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+    
+    - name: Test Lambda deployment compatibility
+      run: |
+        python -m pip install --upgrade pip
+        # Install with lambda extras
+        pip install -e .[lambda]
+        # Create a simple Lambda-style test
+        python -c "
+import aligner
+import json
+
+# Test basic functionality
+test_data = {
+    'words': [
+        {'text': 'Hello', 'start': 0.0, 'end': 0.5},
+        {'text': 'world.', 'start': 0.5, 'end': 1.0},
+        {'text': 'How', 'start': 2.0, 'end': 2.3},
+        {'text': 'are', 'start': 2.3, 'end': 2.5},
+        {'text': 'you?', 'start': 2.5, 'end': 3.0}
+    ]
+}
+
+# Test segmentation
+segments = aligner.segment_transcription(test_data)
+print(f'Lambda compatibility test passed: {len(segments)} segments created')
+"

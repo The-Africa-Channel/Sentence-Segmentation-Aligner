@@ -1,6 +1,24 @@
 import json
-import re
 from typing import List, Dict, Union, Optional
+
+# Robust regex import for AWS Lambda compatibility
+try:
+    import re
+except ImportError:
+    # Fallback to regex package if standard re module fails (rare Lambda edge case)
+    try:
+        import regex as re
+    except ImportError:
+        raise ImportError("Neither 're' nor 'regex' modules are available. Please install regex package.")
+
+# Try to use the enhanced regex package if available, otherwise use standard re
+try:
+    import regex as enhanced_re
+    # Use enhanced regex for better Unicode support if available
+    RE_MODULE = enhanced_re
+except ImportError:
+    # Fall back to standard library re module
+    RE_MODULE = re
 
 
 # Constants
@@ -8,7 +26,8 @@ BIG_PAUSE_SECONDS = 0.75
 MIN_WORDS_IN_SEGMENT = 2
 
 # Basic sentence tokenizer to avoid heavy dependencies
-SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?。！？])\s+")
+# Use the selected regex module for pattern compilation
+SENTENCE_SPLIT_RE = RE_MODULE.compile(r"(?<=[.!?。！？])\s+")
 
 
 def simple_sentence_tokenize(text: str) -> List[str]:
@@ -111,16 +130,12 @@ def merge_on_sentence_boundary(
         language_code: ISO 639-3 language code for sentence tokenization.
 
     Returns:
-        List of merged segments split at sentence boundaries.
-    """
-    import re
+        List of merged segments split at sentence boundaries.    """
     import string
 
     merged_segments = []
-    buffer_segment = []
-
-    # Unicode-aware regex for acronyms (e.g., B.M.W., A.B.S.)
-    acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
+    buffer_segment = []    # Unicode-aware regex for acronyms (e.g., B.M.W., A.B.S.)
+    acronym_pattern = RE_MODULE.compile(r"((?:[A-ZÄÖÜ]\.){2,})", RE_MODULE.UNICODE)
     ACRONYM_PLACEHOLDER = "__ACRONYM__"
 
     def replace_acronyms(text):
@@ -175,13 +190,11 @@ def split_long_segments_on_sentence(
         language_code: ISO 639-3 language code for sentence tokenization.
 
     Returns:
-        List of segments, split so that no segment exceeds max_duration.
-    """
+        List of segments, split so that no segment exceeds max_duration.    """
     import string
-    import re
 
     # Use the same acronym handling as merge_on_sentence_boundary
-    acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
+    acronym_pattern = RE_MODULE.compile(r"((?:[A-ZÄÖÜ]\.){2,})", RE_MODULE.UNICODE)
     ACRONYM_PLACEHOLDER = "__ACRONYM__"
 
     def replace_acronyms(text):
@@ -413,18 +426,23 @@ def segment_transcription(
 
 def save_segments_as_srt(
     segments: List[List[Dict]],
-    filepath: str,
+    filepath: str = None,
     speaker_brackets: bool = False,
     speaker_map: Union[Dict[str, str], None] = None,
-) -> None:
+    return_string: bool = False,
+) -> Union[None, str]:
     """
-    Save segments as an SRT subtitle file.
+    Save segments as an SRT subtitle file or return as string.
 
     Args:
         segments: List of segments (each a list of word dicts).
-        filepath: Path to the output SRT file.
+        filepath: Path to the output SRT file (optional if return_string=True).
         speaker_brackets: If True, prefix each segment with '[Speaker]' in the SRT.
         speaker_map: Optional mapping to rename speaker IDs.
+        return_string: If True, return the SRT content as a string instead of writing to file.
+        
+    Returns:
+        None if writing to file, or the SRT content as string if return_string=True.
     """
 
     def format_time(seconds):
@@ -434,19 +452,30 @@ def save_segments_as_srt(
         ms = int((seconds - int(seconds)) * 1000)
         return f"{h:02}:{m:02}:{s:02},{ms:03}"
 
-    with open(filepath, "w", encoding="utf-8") as f:
-        for idx, segment in enumerate(segments, 1):
-            start = format_time(segment[0]["start"])
-            end = format_time(segment[-1]["end"])
-            text = " ".join(w["text"] for w in segment)
-            speaker = segment[0]["speaker_id"]
-            if speaker_map:
-                speaker = speaker_map.get(speaker, speaker)
-            if speaker_brackets:
-                label = f"- [{speaker}] "
-            else:
-                label = f"[{speaker}] "
-            f.write(f"{idx}\n{start} --> {end}\n{label}{text}\n\n")
+    # Build the SRT content
+    srt_lines = []
+    for idx, segment in enumerate(segments, 1):
+        start = format_time(segment[0]["start"])
+        end = format_time(segment[-1]["end"])
+        text = " ".join(w["text"] for w in segment)
+        speaker = segment[0]["speaker_id"]
+        if speaker_map:
+            speaker = speaker_map.get(speaker, speaker)
+        if speaker_brackets:
+            label = f"- [{speaker}] "
+        else:
+            label = f"[{speaker}] "
+        srt_lines.append(f"{idx}\n{start} --> {end}\n{label}{text}\n")
+    
+    srt_content = "\n".join(srt_lines)
+    
+    if return_string:
+        return srt_content
+    else:
+        if filepath is None:
+            raise ValueError("filepath must be provided when return_string=False")
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(srt_content)
 
 
 # Add a main() function for pip install entry point

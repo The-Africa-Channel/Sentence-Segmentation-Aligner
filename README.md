@@ -226,7 +226,7 @@ missing required fields.
 | `print_segments(segments, speaker_brackets=False, speaker_map=None)` | `segments: List[List[Dict]]` | `None` |
 | `get_grouped_segments(words, language_code='eng', max_duration=15.0, big_pause_seconds=0.75, min_words_in_segment=2, skip_punctuation_only=False)` | `words: List[Dict]` | `List[List[Dict]]` |
 | `segment_transcription(transcription, big_pause_seconds=0.75, min_words_in_segment=2, max_duration=15.0, language_code=None, speaker_brackets=False, skip_punctuation_only=False)` | `transcription: Union[str, Dict]` | `List[Dict]` |
-| `save_segments_as_srt(segments, filepath, speaker_brackets=False, speaker_map=None)` | `segments: List[List[Dict]]` | `None` |
+| `save_segments_as_srt(segments, filepath=None, speaker_brackets=False, speaker_map=None, return_string=False)` | `segments: List[List[Dict]]` | `None or str` |
 
 #### Parameter Details
 

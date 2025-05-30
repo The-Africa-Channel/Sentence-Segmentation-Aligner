@@ -1,0 +1,11 @@
+# Production dependencies
+# This package uses only Python standard library modules
+# No external dependencies are required for core functionality
+
+# Optional: regex package for enhanced regex compatibility in specific environments
+# Uncomment the line below if you encounter regex-related issues in serverless environments
+# regex>=2022.1.18; python_version>="3.9"
+
+# Development dependencies (install with: pip install -e .[dev])
+# pytest>=6.0
+# pytest-cov>=2.10
