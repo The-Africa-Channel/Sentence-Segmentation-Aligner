@@ -19,7 +19,9 @@ segments = segment_transcription(
 
 # Print the results
 for i, seg in enumerate(segments, 1):
-    print(f"Segment {i}: {seg['speaker']} ({seg['start']:.2f}-{seg['end']:.2f})\n{seg['text']}\n")
+    print(
+        f"Segment {i}: {seg['speaker']} ({seg['start']:.2f}-{seg['end']:.2f})\n{seg['text']}\n"
+    )
 
 # Save as SRT (subtitle) file
 SRT_PATH = os.path.join(os.path.dirname(__file__), "sample", "transcription.srt")
@@ -28,6 +30,7 @@ with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
     words = json.load(f)["words"]
 
 from aligner import get_grouped_segments
+
 segments_for_srt = get_grouped_segments(
     words,
     max_duration=15.0,

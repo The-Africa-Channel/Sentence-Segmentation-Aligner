@@ -1,24 +1,6 @@
 import json
+import re
 from typing import List, Dict, Union, Optional
-
-# Robust regex import for AWS Lambda compatibility
-try:
-    import re
-except ImportError:
-    # Fallback to regex package if standard re module fails (rare Lambda edge case)
-    try:
-        import regex as re
-    except ImportError:
-        raise ImportError("Neither 're' nor 'regex' modules are available. Please install regex package.")
-
-# Try to use the enhanced regex package if available, otherwise use standard re
-try:
-    import regex as enhanced_re
-    # Use enhanced regex for better Unicode support if available
-    RE_MODULE = enhanced_re
-except ImportError:
-    # Fall back to standard library re module
-    RE_MODULE = re
 
 
 # Constants
@@ -26,14 +8,14 @@ BIG_PAUSE_SECONDS = 0.75
 MIN_WORDS_IN_SEGMENT = 2
 
 # Basic sentence tokenizer to avoid heavy dependencies
-# Use the selected regex module for pattern compilation
-SENTENCE_SPLIT_RE = RE_MODULE.compile(r"(?<=[.!?。！？])\s+")
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?。！？])\s+")
 
 
 def simple_sentence_tokenize(text: str) -> List[str]:
     """Lightweight sentence tokenizer using regex."""
     sentences = SENTENCE_SPLIT_RE.split(text)
     return [s.strip() for s in sentences if s.strip()]
+
 
 # Map ISO 639-1 codes to ISO 639-3 for convenience
 ISO1_TO_ISO3 = {
@@ -109,11 +91,13 @@ def initial_grouping(
             current_segment = [word]
         else:
             current_segment.append(word)
-    segments.append(current_segment)
-
-    # Ensure no segments are too short
+    segments.append(
+        current_segment
+    )  # Ensure no segments are too short, but don't merge different speakers
     if len(segments[-1]) < min_words_in_segment and len(segments) > 1:
-        segments[-2].extend(segments.pop())
+        # Only merge if speakers are the same
+        if segments[-1][0]["speaker_id"] == segments[-2][-1]["speaker_id"]:
+            segments[-2].extend(segments.pop())
 
     return segments
 
@@ -130,12 +114,16 @@ def merge_on_sentence_boundary(
         language_code: ISO 639-3 language code for sentence tokenization.
 
     Returns:
-        List of merged segments split at sentence boundaries.    """
+        List of merged segments split at sentence boundaries.
+    """
+    import re
     import string
 
     merged_segments = []
-    buffer_segment = []    # Unicode-aware regex for acronyms (e.g., B.M.W., A.B.S.)
-    acronym_pattern = RE_MODULE.compile(r"((?:[A-ZÄÖÜ]\.){2,})", RE_MODULE.UNICODE)
+    buffer_segment = []
+
+    # Unicode-aware regex for acronyms (e.g., B.M.W., A.B.S.)
+    acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
     ACRONYM_PLACEHOLDER = "__ACRONYM__"
 
     def replace_acronyms(text):
@@ -190,11 +178,13 @@ def split_long_segments_on_sentence(
         language_code: ISO 639-3 language code for sentence tokenization.
 
     Returns:
-        List of segments, split so that no segment exceeds max_duration.    """
+        List of segments, split so that no segment exceeds max_duration.
+    """
     import string
+    import re
 
     # Use the same acronym handling as merge_on_sentence_boundary
-    acronym_pattern = RE_MODULE.compile(r"((?:[A-ZÄÖÜ]\.){2,})", RE_MODULE.UNICODE)
+    acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
     ACRONYM_PLACEHOLDER = "__ACRONYM__"
 
     def replace_acronyms(text):
@@ -424,25 +414,65 @@ def segment_transcription(
     return results
 
 
+def normalize_speaker_id(speaker_id: str) -> str:
+    """
+    Normalize speaker IDs to the standard "Speaker N" format.
+
+    Args:
+        speaker_id: Raw speaker ID (e.g., "spk1", "speaker_1", "SPEAKER_01")
+
+    Returns:
+        Normalized speaker ID (e.g., "Speaker 1")
+    """
+    if not speaker_id:
+        return "Speaker 1"
+
+    # Remove common prefixes and clean up
+    cleaned = speaker_id.lower()
+
+    # Handle various patterns
+    patterns_to_remove = ["spk", "speaker", "speaker_", "spk_"]
+    for pattern in patterns_to_remove:
+        if cleaned.startswith(pattern):
+            cleaned = cleaned[len(pattern) :]
+            break
+
+    # Extract numeric part
+    import re
+
+    match = re.search(r"(\d+)", cleaned)
+    if match:
+        num = int(match.group(1))
+        # Convert 0-based numbering to 1-based for speaker_N format
+        # but keep 1-based numbering as-is for spk_N format
+        if speaker_id.lower().startswith("speaker_"):
+            # This is 0-based (speaker_0, speaker_1) -> convert to 1-based
+            num += 1
+        elif num == 0:
+            # Handle edge case where other formats use 0
+            num = 1
+        return f"Speaker {num}"
+
+    # Fallback: if no number found, assume Speaker 1
+    return "Speaker 1"
+
+
 def save_segments_as_srt(
     segments: List[List[Dict]],
-    filepath: str = None,
+    filepath: str,
     speaker_brackets: bool = False,
     speaker_map: Union[Dict[str, str], None] = None,
-    return_string: bool = False,
-) -> Union[None, str]:
+    normalize_speakers: bool = True,
+) -> None:
     """
-    Save segments as an SRT subtitle file or return as string.
+    Save segments as an SRT subtitle file.
 
     Args:
         segments: List of segments (each a list of word dicts).
-        filepath: Path to the output SRT file (optional if return_string=True).
+        filepath: Path to the output SRT file.
         speaker_brackets: If True, prefix each segment with '[Speaker]' in the SRT.
         speaker_map: Optional mapping to rename speaker IDs.
-        return_string: If True, return the SRT content as a string instead of writing to file.
-        
-    Returns:
-        None if writing to file, or the SRT content as string if return_string=True.
+        normalize_speakers: If True, normalize speaker IDs to "Speaker N" format.
     """
 
     def format_time(seconds):
@@ -452,30 +482,26 @@ def save_segments_as_srt(
         ms = int((seconds - int(seconds)) * 1000)
         return f"{h:02}:{m:02}:{s:02},{ms:03}"
 
-    # Build the SRT content
-    srt_lines = []
-    for idx, segment in enumerate(segments, 1):
-        start = format_time(segment[0]["start"])
-        end = format_time(segment[-1]["end"])
-        text = " ".join(w["text"] for w in segment)
-        speaker = segment[0]["speaker_id"]
-        if speaker_map:
-            speaker = speaker_map.get(speaker, speaker)
-        if speaker_brackets:
-            label = f"- [{speaker}] "
-        else:
-            label = f"[{speaker}] "
-        srt_lines.append(f"{idx}\n{start} --> {end}\n{label}{text}\n")
-    
-    srt_content = "\n".join(srt_lines)
-    
-    if return_string:
-        return srt_content
-    else:
-        if filepath is None:
-            raise ValueError("filepath must be provided when return_string=False")
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(srt_content)
+    with open(filepath, "w", encoding="utf-8") as f:
+        for idx, segment in enumerate(segments, 1):
+            start = format_time(segment[0]["start"])
+            end = format_time(segment[-1]["end"])
+            text = " ".join(w["text"] for w in segment)
+            speaker = segment[0]["speaker_id"]
+
+            # Apply speaker mapping first if provided
+            if speaker_map:
+                speaker = speaker_map.get(speaker, speaker)
+
+            # Normalize speaker ID if requested
+            if normalize_speakers:
+                speaker = normalize_speaker_id(speaker)
+
+            if speaker_brackets:
+                label = f"- [{speaker}] "
+            else:
+                label = f"[{speaker}] "
+            f.write(f"{idx}\n{start} --> {end}\n{label}{text}\n\n")
 
 
 # Add a main() function for pip install entry point
