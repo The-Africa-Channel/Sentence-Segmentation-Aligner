@@ -83,20 +83,27 @@ def initial_grouping(
     current_segment = [words[0]]
 
     for word in words[1:]:
+        # Handle missing or None speaker_id by providing defaults
+        current_speaker = current_segment[-1].get("speaker_id", "speaker_0")
+        word_speaker = word.get("speaker_id", "speaker_0")
+
         if (
             word["start"] - current_segment[-1]["end"] > big_pause_seconds
-            or word["speaker_id"] != current_segment[-1]["speaker_id"]
+            or word_speaker != current_speaker
         ):
             segments.append(current_segment)
             current_segment = [word]
         else:
             current_segment.append(word)
-    segments.append(
-        current_segment
-    )  # Ensure no segments are too short, but don't merge different speakers
+
+    segments.append(current_segment)
+
+    # Ensure no segments are too short, but don't merge different speakers
     if len(segments[-1]) < min_words_in_segment and len(segments) > 1:
         # Only merge if speakers are the same
-        if segments[-1][0]["speaker_id"] == segments[-2][-1]["speaker_id"]:
+        last_speaker = segments[-1][0].get("speaker_id", "speaker_0")
+        prev_speaker = segments[-2][-1].get("speaker_id", "speaker_0")
+        if last_speaker == prev_speaker:
             segments[-2].extend(segments.pop())
 
     return segments
@@ -135,6 +142,21 @@ def merge_on_sentence_boundary(
         return text.replace(ACRONYM_PLACEHOLDER, ".")
 
     for segment in segments:
+        # Check if this segment has a different speaker than the current buffer
+        segment_speaker = (
+            segment[0].get("speaker_id", "speaker_0") if segment else "speaker_0"
+        )
+        buffer_speaker = (
+            buffer_segment[0].get("speaker_id", "speaker_0")
+            if buffer_segment
+            else segment_speaker
+        )
+
+        # If different speaker, finalize current buffer first
+        if buffer_segment and segment_speaker != buffer_speaker:
+            merged_segments.append(buffer_segment)
+            buffer_segment = []
+
         buffer_segment.extend(segment)
         texts = " ".join([w["text"] for w in buffer_segment])
         safe_texts = replace_acronyms(texts)
@@ -482,19 +504,41 @@ def save_segments_as_srt(
         ms = int((seconds - int(seconds)) * 1000)
         return f"{h:02}:{m:02}:{s:02},{ms:03}"
 
+    # If normalizing speakers, create a consistent mapping for all unique speaker IDs
+    if normalize_speakers and not speaker_map:
+        # Collect all unique speaker IDs from segments
+        unique_speakers = set()
+        for segment in segments:
+            if segment:  # Ensure segment is not empty
+                speaker_id = segment[0].get("speaker_id")
+                if speaker_id:
+                    unique_speakers.add(speaker_id)
+
+        # Sort unique speakers for consistent mapping
+        sorted_speakers = sorted(unique_speakers)
+        # Create mapping from raw speaker IDs to normalized Speaker N format
+        speaker_map = {}
+        for i, speaker_id in enumerate(sorted_speakers, 1):
+            speaker_map[speaker_id] = f"Speaker {i}"
+
     with open(filepath, "w", encoding="utf-8") as f:
         for idx, segment in enumerate(segments, 1):
             start = format_time(segment[0]["start"])
             end = format_time(segment[-1]["end"])
-            text = " ".join(w["text"] for w in segment)
-            speaker = segment[0]["speaker_id"]
 
-            # Apply speaker mapping first if provided
+            # Clean text by removing null characters and normalizing whitespace
+            raw_text = " ".join(w["text"] for w in segment)
+            text = raw_text.replace("\x00", "").strip()
+            if not text:
+                continue  # Skip empty segments
+
+            speaker = segment[0].get("speaker_id", "unknown")
+
+            # Apply speaker mapping if available
             if speaker_map:
                 speaker = speaker_map.get(speaker, speaker)
-
-            # Normalize speaker ID if requested
-            if normalize_speakers:
+            # Apply individual normalization if no speaker map exists and normalization is requested
+            elif normalize_speakers:
                 speaker = normalize_speaker_id(speaker)
 
             if speaker_brackets:

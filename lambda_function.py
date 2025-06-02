@@ -41,7 +41,7 @@ def lambda_handler(event, context):
                 "body": json.dumps(
                     {"error": "Missing or empty words array in transcription"}
                 ),
-            }        # Process transcription
+            }  # Process transcription
         if output_format == "srt":
             # For SRT output, use get_grouped_segments
             segments = aligner.get_grouped_segments(
@@ -70,9 +70,9 @@ def lambda_handler(event, context):
                     label = f"- [{speaker}] "
                 else:
                     label = f"[{speaker}] "
-                
+
                 srt_lines.append(f"{idx}\n{start} --> {end}\n{label}{text}\n")
-            
+
             result = "\n".join(srt_lines)
             content_type = "text/plain"
 
