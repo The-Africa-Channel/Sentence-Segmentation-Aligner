@@ -274,20 +274,38 @@ This package is designed for AWS Lambda deployment with enhanced serverless comp
                max_duration=event.get('max_duration', 15.0),
                speaker_brackets=event.get('speaker_brackets', True)
            )
-           
-           if output_format == 'srt':
-               # Generate SRT string for API response
+             if output_format == 'srt':
+               # Generate SRT content manually for API response
                grouped_segments = get_grouped_segments(
                    transcription['words'],
                    max_duration=event.get('max_duration', 15.0),
                    big_pause_seconds=event.get('big_pause_seconds', 0.75),
                    min_words_in_segment=event.get('min_words_in_segment', 2)
                )
-               srt_content = save_segments_as_srt(
-                   grouped_segments, 
-                   speaker_brackets=event.get('speaker_brackets', True),
-                   return_string=True
-               )
+               
+               # Manual SRT generation for Lambda
+               def format_time(seconds):
+                   h = int(seconds // 3600)
+                   m = int((seconds % 3600) // 60)
+                   s = int(seconds % 60)
+                   ms = int((seconds - int(seconds)) * 1000)
+                   return f"{h:02}:{m:02}:{s:02},{ms:03}"
+
+               srt_lines = []
+               for idx, segment in enumerate(grouped_segments, 1):
+                   start = format_time(segment[0]["start"])
+                   end = format_time(segment[-1]["end"])
+                   text = " ".join(w["text"] for w in segment)
+                   speaker = segment[0]["speaker_id"]
+
+                   if event.get('speaker_brackets', True):
+                       label = f"- [{speaker}] "
+                   else:
+                       label = f"[{speaker}] "
+                   
+                   srt_lines.append(f"{idx}\n{start} --> {end}\n{label}{text}\n")
+               
+               srt_content = "\n".join(srt_lines)
                return {
                    'statusCode': 200,
                    'body': json.dumps({
@@ -319,7 +337,7 @@ This package is designed for AWS Lambda deployment with enhanced serverless comp
 
 - **Zero Dependencies**: Core functionality works without external packages
 - **Enhanced Regex**: Automatic fallback to `regex` package if standard `re` module limitations are encountered
-- **String Output**: `save_segments_as_srt()` supports `return_string=True` for API responses
+- **Manual SRT Generation**: Built-in SRT formatting for API responses without file I/O
 - **Error Handling**: Comprehensive error handling for serverless environments
 - **Small Package Size**: Minimal footprint for fast Lambda cold starts
 
@@ -336,15 +354,15 @@ This package is designed for AWS Lambda deployment with enhanced serverless comp
 | `print_segments(segments, speaker_brackets=False, speaker_map=None)` | `segments: List[List[Dict]]` | `None` |
 | `get_grouped_segments(words, language_code='eng', max_duration=15.0, big_pause_seconds=0.75, min_words_in_segment=2, skip_punctuation_only=False)` | `words: List[Dict]` | `List[List[Dict]]` |
 | `segment_transcription(transcription, big_pause_seconds=0.75, min_words_in_segment=2, max_duration=15.0, language_code=None, speaker_brackets=False, skip_punctuation_only=False)` | `transcription: Union[str, Dict]` | `List[Dict]` |
-| `save_segments_as_srt(segments, filepath=None, speaker_brackets=False, speaker_map=None, return_string=False)` | `segments: List[List[Dict]]` | `None or str` |
+| `save_segments_as_srt(segments, filepath, speaker_brackets=False, speaker_map=None, normalize_speakers=True)` | `segments: List[List[Dict]]` | `None` |
 
 #### Parameter Details
 
 - **min_words_in_segment**: Controls the minimum number of words required in each segment. If the last segment after grouping is shorter than this value, it will be merged with the previous segment. This prevents the output from ending with a fragment or a single word.
 - **fix_orphaned_punctuation / merge_punctuation_only_segments**: If enabled (default), any segment that contains only punctuation marks (such as '.', '!', '?', etc.) will be merged with the previous segment. This is useful for producing cleaner output, especially when punctuation tokens are separated from words in the input. This behavior is now the default.
 - **max_duration**: Controls the maximum allowed segment duration in seconds. If a segment is longer than this value, it will be split at the nearest sentence boundary. Default is 15.0 seconds.
-- **return_string**: (save_segments_as_srt only) When True, returns the SRT content as a string instead of writing to a file. Useful for API responses and Lambda functions.
 - **language_code**: ISO 639-1 or 639-3 language code for sentence boundary detection. Automatically detected from transcription if not provided.
+- **normalize_speakers**: (save_segments_as_srt only) When True, normalizes speaker IDs to "Speaker N" format for cleaner output.
 
 ### Extensibility
 

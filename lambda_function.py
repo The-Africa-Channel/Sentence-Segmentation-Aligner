@@ -41,9 +41,7 @@ def lambda_handler(event, context):
                 "body": json.dumps(
                     {"error": "Missing or empty words array in transcription"}
                 ),
-            }
-
-        # Process transcription
+            }        # Process transcription
         if output_format == "srt":
             # For SRT output, use get_grouped_segments
             segments = aligner.get_grouped_segments(
@@ -53,9 +51,29 @@ def lambda_handler(event, context):
                 min_words_in_segment=min_words_in_segment,
             )
 
-            result = aligner.save_segments_as_srt(
-                segments, speaker_brackets=speaker_brackets, return_string=True
-            )
+            # Generate SRT content manually since save_segments_as_srt doesn't support return_string
+            def format_time(seconds):
+                h = int(seconds // 3600)
+                m = int((seconds % 3600) // 60)
+                s = int(seconds % 60)
+                ms = int((seconds - int(seconds)) * 1000)
+                return f"{h:02}:{m:02}:{s:02},{ms:03}"
+
+            srt_lines = []
+            for idx, segment in enumerate(segments, 1):
+                start = format_time(segment[0]["start"])
+                end = format_time(segment[-1]["end"])
+                text = " ".join(w["text"] for w in segment)
+                speaker = segment[0]["speaker_id"]
+
+                if speaker_brackets:
+                    label = f"- [{speaker}] "
+                else:
+                    label = f"[{speaker}] "
+                
+                srt_lines.append(f"{idx}\n{start} --> {end}\n{label}{text}\n")
+            
+            result = "\n".join(srt_lines)
             content_type = "text/plain"
 
         else:
