@@ -12,7 +12,8 @@ setup(
     author="Chris Eckman",
     url="https://github.com/chriseckman/Sentence-Segmentation-Aligner",
     packages=find_packages(),
-    py_modules=["aligner"],    install_requires=[
+    py_modules=["aligner"],
+    install_requires=[
         # Standard library only - no required dependencies
     ],
     extras_require={
@@ -25,7 +26,7 @@ setup(
         ],
         "all": [
             "regex>=2022.1.18",
-            "pytest>=6.0", 
+            "pytest>=6.0",
             "pytest-cov>=2.10",
         ],
     },

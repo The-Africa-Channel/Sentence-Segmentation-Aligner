@@ -1,38 +1,69 @@
 # Sentence-Segmentation-Aligner
 
-A Python tool for segmenting and aligning sentences in transcriptions, with speaker and timing information. Supports multiple languages and robust handling of acronyms and long segments.
+A Python tool for segmenting and aligning sentences in transcriptions, with speaker and timing information. Built for production use with AWS Lambda deployment, pip installation, and support for Python 3.9-3.13.
 
 ## Features
-- Groups words into segments based on pauses and speaker changes
-- Merges segments on sentence boundaries using a lightweight tokenizer
-- Prevents sentence splits inside acronyms (e.g., B.M.W., A.B.S.)
-- Splits any segment longer than 15 seconds at the nearest sentence boundary
-- Prints segments with speaker, start/end time, and text
-- Supports a wide range of source and target languages
-- Configurable pause length and minimum words per segment
-- Optional speaker label formatting with brackets and a hyphen (e.g., `- [speaker_1]`)
-- Ability to skip punctuation-only segments
-
-## Supported Languages
-
-**Source Languages:**
-- English, Spanish, Portuguese, French, German, Italian, Dutch, Mandarin, Korean, Arabic, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Punjabi, Malayalam, Urdu
-
-**Target Languages:**
-- English, Spanish, Portuguese, French, German, Italian, Dutch, Mandarin, Korean, Arabic, Hindi, Tamil
+- **Smart Segmentation**: Groups words into segments based on pauses and speaker changes
+- **Sentence-Aware**: Merges segments on sentence boundaries using a lightweight regex tokenizer
+- **Acronym Protection**: Prevents sentence splits inside acronyms (e.g., B.M.W., A.B.S.)
+- **Duration Control**: Splits segments longer than configurable duration at the nearest sentence boundary
+- **Multiple Output Formats**: Console output, SRT subtitles, JSON, and API-friendly string output
+- **Multi-Language Support**: Wide range of source and target languages with ISO 639-1/639-3 codes
+- **Configurable Parameters**: Pause length, minimum words per segment, max duration, and more
+- **Speaker Formatting**: Optional speaker label formatting with brackets (e.g., `- [Speaker 1]`)
+- **Punctuation Handling**: Merges punctuation-only segments for cleaner output
+- **Zero Dependencies**: Core functionality uses only Python standard library
+- **AWS Lambda Ready**: Serverless deployment with enhanced regex compatibility
+- **Production Ready**: Supports Python 3.9-3.13 with CI/CD testing
+- **Pip Installable**: Available as a proper Python package with optional extras
 
 ## Installation
 
-1. Clone this repository or download the source code.
-2. (Recommended) Create and activate a virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install the package in editable mode:
-   ```bash
-   pip install -e .
-   ```
+### Prerequisites
+- Python 3.9+ (tested on Python 3.9-3.13)
+- pip (package installer for Python)
+
+### Option 1: Pip Installation (Recommended)
+```bash
+# Standard installation (zero dependencies)
+pip install sentence-segmentation-aligner
+
+# With AWS Lambda extras (enhanced regex compatibility)
+pip install sentence-segmentation-aligner[lambda]
+
+# Development installation with testing tools
+pip install sentence-segmentation-aligner[dev]
+
+# All optional dependencies
+pip install sentence-segmentation-aligner[all]
+```
+
+### Option 2: Development Installation
+```bash
+# Clone the repository
+git clone https://github.com/The-Africa-Channel/Sentence-Segmentation-Aligner.git
+cd Sentence-Segmentation-Aligner
+
+# Install in editable mode
+pip install -e .
+
+# Or with development dependencies
+pip install -e .[dev]
+```
+
+### Option 3: Direct Usage
+```bash
+# Clone and run directly
+git clone https://github.com/The-Africa-Channel/Sentence-Segmentation-Aligner.git
+cd Sentence-Segmentation-Aligner
+python aligner.py sample/transcription.json
+```
+
+### Installation Extras
+
+- **`[lambda]`**: Includes `regex` package for enhanced compatibility in AWS Lambda environments
+- **`[dev]`**: Includes testing dependencies (`pytest`, `unittest`)
+- **`[all]`**: Includes all optional dependencies
 
 ## Usage
 
@@ -213,6 +244,85 @@ segment index is not included but can be derived when iterating over the list.
 `segment_transcription` raises `ValueError` if the input transcription is
 missing required fields.
 
+## AWS Lambda Deployment
+
+This package is designed for AWS Lambda deployment with enhanced serverless compatibility. The core package has zero dependencies and uses the Python standard library for maximum compatibility.
+
+### Quick Lambda Setup
+
+1. **Install with Lambda extras:**
+   ```bash
+   pip install sentence-segmentation-aligner[lambda]
+   ```
+
+2. **Use the provided Lambda function template:**
+   ```python
+   from aligner import segment_transcription, save_segments_as_srt, get_grouped_segments
+   import json
+   
+   def lambda_handler(event, context):
+       try:
+           # Extract transcription from event
+           transcription = event.get('transcription')
+           output_format = event.get('format', 'segments')  # 'segments', 'srt', 'grouped'
+           
+           # Segment the transcription
+           segments = segment_transcription(
+               transcription,
+               big_pause_seconds=event.get('big_pause_seconds', 0.75),
+               min_words_in_segment=event.get('min_words_in_segment', 2),
+               max_duration=event.get('max_duration', 15.0),
+               speaker_brackets=event.get('speaker_brackets', True)
+           )
+           
+           if output_format == 'srt':
+               # Generate SRT string for API response
+               grouped_segments = get_grouped_segments(
+                   transcription['words'],
+                   max_duration=event.get('max_duration', 15.0),
+                   big_pause_seconds=event.get('big_pause_seconds', 0.75),
+                   min_words_in_segment=event.get('min_words_in_segment', 2)
+               )
+               srt_content = save_segments_as_srt(
+                   grouped_segments, 
+                   speaker_brackets=event.get('speaker_brackets', True),
+                   return_string=True
+               )
+               return {
+                   'statusCode': 200,
+                   'body': json.dumps({
+                       'format': 'srt',
+                       'content': srt_content,
+                       'segment_count': len(grouped_segments)
+                   })
+               }
+           
+           return {
+               'statusCode': 200,
+               'body': json.dumps({
+                   'format': output_format,
+                   'segments': segments,
+                   'segment_count': len(segments)
+               })
+           }
+           
+       except Exception as e:
+           return {
+               'statusCode': 400,
+               'body': json.dumps({'error': str(e)})
+           }
+   ```
+
+3. **For detailed deployment instructions, see [LAMBDA_DEPLOYMENT.md](LAMBDA_DEPLOYMENT.md)**
+
+### Lambda Features
+
+- **Zero Dependencies**: Core functionality works without external packages
+- **Enhanced Regex**: Automatic fallback to `regex` package if standard `re` module limitations are encountered
+- **String Output**: `save_segments_as_srt()` supports `return_string=True` for API responses
+- **Error Handling**: Comprehensive error handling for serverless environments
+- **Small Package Size**: Minimal footprint for fast Lambda cold starts
+
 ### Function Reference
 
 | Function | Parameters | Returns |
@@ -233,6 +343,8 @@ missing required fields.
 - **min_words_in_segment**: Controls the minimum number of words required in each segment. If the last segment after grouping is shorter than this value, it will be merged with the previous segment. This prevents the output from ending with a fragment or a single word.
 - **fix_orphaned_punctuation / merge_punctuation_only_segments**: If enabled (default), any segment that contains only punctuation marks (such as '.', '!', '?', etc.) will be merged with the previous segment. This is useful for producing cleaner output, especially when punctuation tokens are separated from words in the input. This behavior is now the default.
 - **max_duration**: Controls the maximum allowed segment duration in seconds. If a segment is longer than this value, it will be split at the nearest sentence boundary. Default is 15.0 seconds.
+- **return_string**: (save_segments_as_srt only) When True, returns the SRT content as a string instead of writing to a file. Useful for API responses and Lambda functions.
+- **language_code**: ISO 639-1 or 639-3 language code for sentence boundary detection. Automatically detected from transcription if not provided.
 
 ### Extensibility
 
@@ -249,21 +361,49 @@ domain-specific abbreviations.
 - **Final Merging:** Segments are merged on sentence boundaries for natural output.
 
 ## Requirements
-- Python 3.7+
-- Tested on Linux and macOS with Python 3.7+.
+- Python 3.9+ (tested on Python 3.9, 3.10, 3.11, 3.12, 3.13)
+- Zero required dependencies (uses Python standard library)
+- Optional: `regex` package for enhanced Lambda compatibility
+- Tested on Linux, macOS, and Windows
+
+## Continuous Integration
+This project uses GitHub Actions for automated testing across multiple Python versions:
+- **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
+- **Test Coverage**: Standard functionality and AWS Lambda compatibility
+- **Platforms**: Linux (Ubuntu latest)
+
+See [`.github/workflows/test.yml`](.github/workflows/test.yml) for the full CI configuration.
 
 ## Development
-- To run the sample:
-  ```bash
-  python run_sample.py
-  ```
-- To run unit tests:
-  ```bash
-  python -m unittest test_aligner.py
-  # or
-  pytest
-  ```
-- To add dependencies, update `requirements.txt` and `setup.py`.
+
+### Running Tests
+```bash
+# Run all tests
+python -m pytest
+
+# Run specific test files
+python -m unittest test_aligner.py
+python -m unittest test_lambda_compatibility.py
+
+# Run with coverage
+pytest --cov=aligner
+```
+
+### Running the Sample
+```bash
+python run_sample.py
+```
+
+### Testing Lambda Compatibility
+```bash
+# Test Lambda-specific functionality
+python test_lambda_compatibility.py
+```
+
+### Adding Dependencies
+- For core functionality: Update both `requirements.txt` and `setup.py`
+- For optional extras: Update `setup.py` extras_require section
+- Maintain zero-dependency core for maximum compatibility
 
 ### Example Unit Test
 
@@ -289,15 +429,29 @@ RUN pip install -e .
 
 ### Deployment Notes
 
-The project supports Python 3.7 and above. Ensure the operating system has the
-standard C++ runtime available (e.g., `libstdc++6` on Debian/Ubuntu). All tests
-are run on Linux containers, but the code should work on any OS with Python 3.7+
+This project supports Python 3.9+ and is tested across all versions from 3.9 to 3.13. The core functionality has zero dependencies and uses only the Python standard library for maximum compatibility.
+
+**Key Compatibility Features:**
+- **Zero Dependencies**: Core functionality works with standard library only
+- **Enhanced Regex**: Automatic fallback to `regex` package for complex patterns in Lambda environments
+- **Cross-Platform**: Tested on Linux, macOS, and Windows
+- **Serverless Ready**: Optimized for AWS Lambda with small package size and fast cold starts
+
+**Production Deployment:**
+- Use `pip install sentence-segmentation-aligner` for standard deployments
+- Use `pip install sentence-segmentation-aligner[lambda]` for AWS Lambda
+- Docker deployments work with any Python 3.9+ base image
 
 ### Versioning
 
 This project follows [semantic versioning](https://semver.org). Public
 functions, including `segment_transcription`, may change only in a new major
 version. Consult the changelog for details when upgrading.
+
+## Additional Documentation
+
+- **[LAMBDA_DEPLOYMENT.md](LAMBDA_DEPLOYMENT.md)**: Comprehensive AWS Lambda deployment guide with step-by-step instructions, deployment packages, and troubleshooting
+- **[UPDATE_SUMMARY.md](UPDATE_SUMMARY.md)**: Detailed summary of recent improvements and enhancements to the project
 
 ## License
 Copyright (c) 2025 TAC Labs. All rights reserved.
