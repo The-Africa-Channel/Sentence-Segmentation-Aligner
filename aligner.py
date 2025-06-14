@@ -81,16 +81,19 @@ def initial_grouping(
     if not words:
         return segments
     current_segment = [words[0]]
+    current_speaker = words[0].get("speaker_id", "speaker_0")
 
     for word in words[1:]:
-        # Handle missing or None speaker_id by providing defaults
-        current_speaker = current_segment[-1].get("speaker_id", "speaker_0")
         word_speaker = word.get("speaker_id", "speaker_0")
+        time_gap = word["start"] - current_segment[-1]["end"]
 
-        if (
-            word["start"] - current_segment[-1]["end"] > big_pause_seconds
-            or word_speaker != current_speaker
-        ):
+        # FIXED: Speaker change ALWAYS triggers new segment, regardless of timing
+        if word_speaker != current_speaker:
+            segments.append(current_segment)
+            current_segment = [word]
+            current_speaker = word_speaker
+        # Only check temporal proximity for SAME speaker
+        elif time_gap > big_pause_seconds:
             segments.append(current_segment)
             current_segment = [word]
         else:
@@ -140,6 +143,13 @@ def merge_on_sentence_boundary(
 
     def restore_acronyms(text):
         return text.replace(ACRONYM_PLACEHOLDER, ".")
+
+    for i, segment in enumerate(segments):
+        speakers = set(w.get("speaker_id") for w in segment)
+        if len(speakers) > 1:
+            print(f"⚠️ WARNING: Segment {i} already contains mixed speakers: {speakers}")
+            for w in segment:
+                print(f"  '{w['text']}' -> {w.get('speaker_id')}")
 
     for segment in segments:
         # Check if this segment has a different speaker than the current buffer

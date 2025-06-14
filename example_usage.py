@@ -1,6 +1,7 @@
 # Example: Using the aligner as an installed pip package
 
 from aligner import segment_transcription, save_segments_as_srt
+from aligner import get_grouped_segments
 import os
 import json
 
@@ -29,7 +30,6 @@ SRT_PATH = os.path.join(os.path.dirname(__file__), "sample", "transcription.srt"
 with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
     words = json.load(f)["words"]
 
-from aligner import get_grouped_segments
 
 segments_for_srt = get_grouped_segments(
     words,
