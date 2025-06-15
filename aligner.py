@@ -4,7 +4,7 @@ from typing import List, Dict, Union, Optional
 
 
 # Constants
-BIG_PAUSE_SECONDS = 0.75
+BIG_PAUSE_SECONDS = 1.0
 MIN_WORDS_IN_SEGMENT = 2
 
 # Basic sentence tokenizer to avoid heavy dependencies
@@ -118,6 +118,7 @@ def merge_on_sentence_boundary(
     """
     Merge segments on sentence boundaries using NLTK's sentence tokenizer.
     Handles acronyms to avoid incorrect sentence splits.
+    CRITICAL: Never merge segments from different speakers.
 
     Args:
         segments: List of segments (each a list of word dicts).
@@ -145,13 +146,13 @@ def merge_on_sentence_boundary(
         return text.replace(ACRONYM_PLACEHOLDER, ".")
 
     for i, segment in enumerate(segments):
+        # Check for mixed speakers within this segment (shouldn't happen, but log if it does)
         speakers = set(w.get("speaker_id") for w in segment)
         if len(speakers) > 1:
             print(f"⚠️ WARNING: Segment {i} already contains mixed speakers: {speakers}")
             for w in segment:
                 print(f"  '{w['text']}' -> {w.get('speaker_id')}")
 
-    for segment in segments:
         # Check if this segment has a different speaker than the current buffer
         segment_speaker = (
             segment[0].get("speaker_id", "speaker_0") if segment else "speaker_0"
@@ -627,3 +628,34 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def validate_speaker_purity(segments: List[List[Dict]]) -> bool:
+    """
+    Validate that no segment contains words from multiple speakers.
+    
+    Args:
+        segments: List of segments (each a list of word dicts).
+        
+    Returns:
+        True if all segments contain only single speakers, False otherwise.
+    """
+    all_pure = True
+    
+    for i, segment in enumerate(segments):
+        if not segment:
+            continue
+            
+        speakers = set(w.get("speaker_id") for w in segment)
+        if len(speakers) > 1:
+            all_pure = False
+            print(f"❌ MIXED SPEAKERS in Segment {i + 1}: {speakers}")
+            text = " ".join(w["text"] for w in segment)
+            print(f"   Text: '{text}'")
+            print(f"   Word-by-word breakdown:")
+            for j, word in enumerate(segment):
+                print(f"     {j + 1:2d}. [{word.get('speaker_id')}] '{word['text']}'")
+        else:
+            speaker = list(speakers)[0] if speakers else "None"
+            print(f"✅ Single speaker in Segment {i + 1}: {speaker}")
+    
+    return all_pure
