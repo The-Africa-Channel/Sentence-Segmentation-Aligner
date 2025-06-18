@@ -15,7 +15,6 @@ from aligner import segment_transcription, get_grouped_segments, save_segments_a
 
 def test_lambda_compatibility():
     """Test that the aligner works in AWS Lambda-like environments."""
-    import tempfile
     import os
 
     # Test data with proper speaker_id fields
