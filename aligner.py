@@ -4,7 +4,7 @@ from typing import List, Dict, Union, Optional
 
 
 # Constants
-BIG_PAUSE_SECONDS = 1.0
+BIG_PAUSE_SECONDS = 2.0
 MIN_WORDS_IN_SEGMENT = 2
 
 # Basic sentence tokenizer to avoid heavy dependencies
@@ -199,7 +199,7 @@ def merge_on_sentence_boundary(
 
 
 def split_long_segments_on_sentence(
-    segments: List[List[Dict]], max_duration: float = 15.0, language_code: str = "eng"
+    segments: List[List[Dict]], max_duration: float = 25.0, language_code: str = "eng"
 ) -> List[List[Dict]]:
     """
     Split any segment longer than max_duration at the nearest sentence boundary.
@@ -336,7 +336,7 @@ def print_segments(
 def get_grouped_segments(
     words: List[Dict],
     language_code: str = "eng",
-    max_duration: float = 15.0,
+    max_duration: float = 25.0,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     skip_punctuation_only: bool = False,
@@ -377,7 +377,7 @@ def segment_transcription(
     *,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
-    max_duration: float = 15.0,
+    max_duration: float = 25.0,
     language_code: Optional[str] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
@@ -589,12 +589,11 @@ def main():
         "--min-words-in-segment",
         type=int,
         default=MIN_WORDS_IN_SEGMENT,
-        help="Minimum number of words in a segment",
-    )
+        help="Minimum number of words in a segment",    )
     parser.add_argument(
         "--max-duration",
         type=float,
-        default=15.0,
+        default=25.0,
         help="Maximum allowed segment duration in seconds before splitting at a sentence boundary",
     )
     parser.add_argument(
@@ -629,33 +628,34 @@ def main():
 if __name__ == "__main__":
     main()
 
+
 def validate_speaker_purity(segments: List[List[Dict]]) -> bool:
     """
     Validate that no segment contains words from multiple speakers.
-    
+
     Args:
         segments: List of segments (each a list of word dicts).
-        
+
     Returns:
         True if all segments contain only single speakers, False otherwise.
     """
     all_pure = True
-    
+
     for i, segment in enumerate(segments):
         if not segment:
             continue
-            
+
         speakers = set(w.get("speaker_id") for w in segment)
         if len(speakers) > 1:
             all_pure = False
             print(f"❌ MIXED SPEAKERS in Segment {i + 1}: {speakers}")
             text = " ".join(w["text"] for w in segment)
             print(f"   Text: '{text}'")
-            print(f"   Word-by-word breakdown:")
+            print("   Word-by-word breakdown:")
             for j, word in enumerate(segment):
                 print(f"     {j + 1:2d}. [{word.get('speaker_id')}] '{word['text']}'")
         else:
             speaker = list(speakers)[0] if speakers else "None"
             print(f"✅ Single speaker in Segment {i + 1}: {speaker}")
-    
+
     return all_pure

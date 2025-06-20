@@ -79,7 +79,7 @@ Key options:
 - `--min-words-in-segment` – minimum number of words in a segment. If the last segment is shorter than this, it will be merged with the previous segment. This helps avoid very short, unnatural segments at the end of the output.
 - `--speaker-brackets` – prefix lines with `- [Speaker]` (e.g., `- [speaker_1]`).
 - `--fix-orphaned-punctuation` – merge segments that contain only punctuation (e.g., '.', '!', '?') into the previous segment. This is enabled by default and results in cleaner, more natural output by ensuring punctuation is attached to the preceding words rather than appearing as a separate segment.
-- `--max-duration` – maximum allowed segment duration in seconds before splitting at a sentence boundary. Segments longer than this will be split at the nearest sentence boundary. Default: 15.0.
+- `--max-duration` – maximum allowed segment duration in seconds before splitting at a sentence boundary. Segments longer than this will be split at the nearest sentence boundary. Default: 25.0.
 
 ### As a Script
 You can also run the script directly:
@@ -186,8 +186,8 @@ SRT_PATH = os.path.join(os.path.dirname(__file__), "sample", "transcription.srt"
 segments = segment_transcription(
     SAMPLE_JSON,
     speaker_brackets=True,
-    max_duration=15.0,
-    big_pause_seconds=0.75,
+    max_duration=25.0,
+    big_pause_seconds=2.0,
     min_words_in_segment=2,
 )
 
@@ -200,8 +200,8 @@ with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
     words = json.load(f)["words"]
 segments_for_srt = get_grouped_segments(
     words,
-    max_duration=15.0,
-    big_pause_seconds=0.75,
+    max_duration=25.0,
+    big_pause_seconds=2.0,
     min_words_in_segment=2,
 )
 save_segments_as_srt(segments_for_srt, SRT_PATH, speaker_brackets=True)
@@ -221,9 +221,9 @@ from aligner import segment_transcription
 
 segments = segment_transcription(
     "sample/transcription.json",
-    big_pause_seconds=1.0,
+    big_pause_seconds=2.0,
     min_words_in_segment=3,
-    max_duration=10.0,  # Example: set duration to size of segment that it will find a breakpoint in punctuation. 
+    max_duration=25.0,  # Example: set duration to size of segment that it will find a breakpoint in punctuation. 
     language_code="en",
     speaker_brackets=True,
     # fix_orphaned_punctuation is True by default
@@ -266,20 +266,18 @@ This package is designed for AWS Lambda deployment with enhanced serverless comp
            transcription = event.get('transcription')
            output_format = event.get('format', 'segments')  # 'segments', 'srt', 'grouped'
            
-           # Segment the transcription
-           segments = segment_transcription(
+           # Segment the transcription           segments = segment_transcription(
                transcription,
-               big_pause_seconds=event.get('big_pause_seconds', 0.75),
+               big_pause_seconds=event.get('big_pause_seconds', 2.0),
                min_words_in_segment=event.get('min_words_in_segment', 2),
-               max_duration=event.get('max_duration', 15.0),
+               max_duration=event.get('max_duration', 25.0),
                speaker_brackets=event.get('speaker_brackets', True)
            )
              if output_format == 'srt':
-               # Generate SRT content manually for API response
-               grouped_segments = get_grouped_segments(
+               # Generate SRT content manually for API response               grouped_segments = get_grouped_segments(
                    transcription['words'],
-                   max_duration=event.get('max_duration', 15.0),
-                   big_pause_seconds=event.get('big_pause_seconds', 0.75),
+                   max_duration=event.get('max_duration', 25.0),
+                   big_pause_seconds=event.get('big_pause_seconds', 2.0),
                    min_words_in_segment=event.get('min_words_in_segment', 2)
                )
                
@@ -346,21 +344,21 @@ This package is designed for AWS Lambda deployment with enhanced serverless comp
 | Function | Parameters | Returns |
 | --- | --- | --- |
 | `normalize_language_code(code)` | `code: str` | `str` |
-| `initial_grouping(words, big_pause_seconds=0.75, min_words_in_segment=2)` | `words: List[Dict]` | `List[List[Dict]]` |
+| `initial_grouping(words, big_pause_seconds=2.0, min_words_in_segment=2)` | `words: List[Dict]` | `List[List[Dict]]` |
 | `merge_on_sentence_boundary(segments, language_code='eng')` | `segments: List[List[Dict]]` | `List[List[Dict]]` |
-| `split_long_segments_on_sentence(segments, max_duration=15.0, language_code='eng')` | `segments: List[List[Dict]]` | `List[List[Dict]]` |
+| `split_long_segments_on_sentence(segments, max_duration=25.0, language_code='eng')` | `segments: List[List[Dict]]` | `List[List[Dict]]` |
 | `remove_punctuation_only_segments(segments)` | `segments: List[List[Dict]]` | `List[List[Dict]]` |
 | `load_json(file_path)` | `file_path: str` | `Dict` |
 | `print_segments(segments, speaker_brackets=False, speaker_map=None)` | `segments: List[List[Dict]]` | `None` |
-| `get_grouped_segments(words, language_code='eng', max_duration=15.0, big_pause_seconds=0.75, min_words_in_segment=2, skip_punctuation_only=False)` | `words: List[Dict]` | `List[List[Dict]]` |
-| `segment_transcription(transcription, big_pause_seconds=0.75, min_words_in_segment=2, max_duration=15.0, language_code=None, speaker_brackets=False, skip_punctuation_only=False)` | `transcription: Union[str, Dict]` | `List[Dict]` |
+| `get_grouped_segments(words, language_code='eng', max_duration=25.0, big_pause_seconds=2.0, min_words_in_segment=2, skip_punctuation_only=False)` | `words: List[Dict]` | `List[List[Dict]]` |
+| `segment_transcription(transcription, big_pause_seconds=2.0, min_words_in_segment=2, max_duration=25.0, language_code=None, speaker_brackets=False, skip_punctuation_only=False)` | `transcription: Union[str, Dict]` | `List[Dict]` |
 | `save_segments_as_srt(segments, filepath, speaker_brackets=False, speaker_map=None, normalize_speakers=True)` | `segments: List[List[Dict]]` | `None` |
 
 #### Parameter Details
 
 - **min_words_in_segment**: Controls the minimum number of words required in each segment. If the last segment after grouping is shorter than this value, it will be merged with the previous segment. This prevents the output from ending with a fragment or a single word.
 - **fix_orphaned_punctuation / merge_punctuation_only_segments**: If enabled (default), any segment that contains only punctuation marks (such as '.', '!', '?', etc.) will be merged with the previous segment. This is useful for producing cleaner output, especially when punctuation tokens are separated from words in the input. This behavior is now the default.
-- **max_duration**: Controls the maximum allowed segment duration in seconds. If a segment is longer than this value, it will be split at the nearest sentence boundary. Default is 15.0 seconds.
+- **max_duration**: Controls the maximum allowed segment duration in seconds. If a segment is longer than this value, it will be split at the nearest sentence boundary. Default is 25.0 seconds.
 - **language_code**: ISO 639-1 or 639-3 language code for sentence boundary detection. Automatically detected from transcription if not provided.
 - **normalize_speakers**: (save_segments_as_srt only) When True, normalizes speaker IDs to "Speaker N" format for cleaner output.
 
