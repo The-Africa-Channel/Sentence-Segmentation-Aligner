@@ -111,8 +111,12 @@ class TestAligner(unittest.TestCase):
         all_speakers = set()
         for segment in final_segments:
             all_speakers.update(w.get("speaker_id") for w in segment)
-        self.assertIn("A", all_speakers, "Speaker A should be present in final segments")
-        self.assertIn("B", all_speakers, "Speaker B should be present in final segments")
+        self.assertIn(
+            "A", all_speakers, "Speaker A should be present in final segments"
+        )
+        self.assertIn(
+            "B", all_speakers, "Speaker B should be present in final segments"
+        )
 
     def test_rapid_speaker_alternation(self):
         """Test rapid speaker changes are handled correctly without combining speakers."""
@@ -144,8 +148,18 @@ class TestAligner(unittest.TestCase):
             {"text": "we", "start": 0.7, "end": 0.9, "speaker_id": "A"},
             {"text": "should", "start": 1.0, "end": 1.3, "speaker_id": "A"},
             # Speaker B talks over A - same timeframe
-            {"text": "No,", "start": 0.8, "end": 1.0, "speaker_id": "B"},  # Overlaps with "we"
-            {"text": "wait!", "start": 1.1, "end": 1.4, "speaker_id": "B"},  # Overlaps with "should"
+            {
+                "text": "No,",
+                "start": 0.8,
+                "end": 1.0,
+                "speaker_id": "B",
+            },  # Overlaps with "we"
+            {
+                "text": "wait!",
+                "start": 1.1,
+                "end": 1.4,
+                "speaker_id": "B",
+            },  # Overlaps with "should"
             # A continues
             {"text": "go", "start": 1.5, "end": 1.7, "speaker_id": "A"},
             {"text": "now.", "start": 1.8, "end": 2.0, "speaker_id": "A"},

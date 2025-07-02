@@ -113,8 +113,7 @@ def initial_grouping(
 
 
 def merge_on_sentence_boundary(
-    segments: List[List[Dict]],
-    language_code: str = "eng"
+    segments: List[List[Dict]], language_code: str = "eng"
 ) -> List[List[Dict]]:
     """
     Merge segments on sentence boundaries using simple tokenization.
@@ -128,7 +127,8 @@ def merge_on_sentence_boundary(
     Returns:
         List of merged segments split at sentence boundaries.
     """
-    import re, string
+    import re
+    import string
 
     merged_segments: List[List[Dict]] = []
     buffer_segment: List[Dict] = []
@@ -148,8 +148,7 @@ def merge_on_sentence_boundary(
     }
     abbrs = ABBR_LISTS.get(language_code, ABBR_LISTS["eng"])
     abbr_pattern = re.compile(
-        r"\b(?:" + "|".join(re.escape(a) for a in abbrs) + r")\.",
-        re.UNICODE
+        r"\b(?:" + "|".join(re.escape(a) for a in abbrs) + r")\.", re.UNICODE
     )
     ABBR_PLACEHOLDER = "__ABBR__"
 
@@ -164,18 +163,12 @@ def merge_on_sentence_boundary(
         )
 
     def restore_placeholders(text: str) -> str:
-        return (
-            text
-            .replace(ACRONYM_PLACEHOLDER, ".")
-            .replace(ABBR_PLACEHOLDER, ".")
-        )
+        return text.replace(ACRONYM_PLACEHOLDER, ".").replace(ABBR_PLACEHOLDER, ".")
 
     for i, segment in enumerate(segments):
         # Flush buffer on speaker change
         seg_spkr = segment[0].get("speaker_id", "speaker_0")
-        buf_spkr = (
-            buffer_segment[0].get("speaker_id") if buffer_segment else seg_spkr
-        )
+        buf_spkr = buffer_segment[0].get("speaker_id") if buffer_segment else seg_spkr
         if buffer_segment and seg_spkr != buf_spkr:
             merged_segments.append(buffer_segment)
             buffer_segment = []
