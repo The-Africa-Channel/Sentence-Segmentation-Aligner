@@ -143,7 +143,7 @@ def merge_on_sentence_boundary(
         "spa": ["Sr", "Sra", "Srta", "Dr", "Lic", "Ing", "etc"],
         "fra": ["M", "Mme", "Mlle", "Dr", "Pr", "Me", "etc"],
         "deu": ["Hr", "Fr", "Dr", "Prof", "etc", "bzw", "z. B"],
-        "ita": ["Sig", "Sig\.ra", "Sig\.na", "Dott", "Prof", "Avv", "etc"],
+        "ita": ["Sig", r"Sig\.ra", r"Sig\.na", "Dott", "Prof", "Avv", "etc"],
         "por": ["Sr", "Sra", "Dout", "Prof", "Dr", "etc"],
     }
     abbrs = ABBR_LISTS.get(language_code, ABBR_LISTS["eng"])
@@ -189,7 +189,7 @@ def merge_on_sentence_boundary(
         sentences = [restore_placeholders(s) for s in sentences]
 
         # If more than one sentence, split at the last full sentence
-        if False:  # Disable sentence boundary splitting
+        if len(sentences) > 1:  # Re-enable sentence boundary splitting
             # Reconstruct the text of all but the final sentence
             finalized_text = " ".join(sentences[:-1]).strip()
             finalized_words: List[Dict] = []
@@ -215,7 +215,7 @@ def merge_on_sentence_boundary(
 
 
 def split_long_segments_on_sentence(
-    segments: List[List[Dict]], max_duration: float = 60.0, language_code: str = "eng"
+    segments: List[List[Dict]], max_duration: float = 25.0, language_code: str = "eng"
 ) -> List[List[Dict]]:
     """
     Split any segment longer than max_duration at the nearest sentence boundary.
@@ -352,7 +352,7 @@ def print_segments(
 def get_grouped_segments(
     words: List[Dict],
     language_code: str = "eng",
-    max_duration: float = 60.0,
+    max_duration: float = 25.0,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     skip_punctuation_only: bool = False,
@@ -393,7 +393,7 @@ def segment_transcription(
     *,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
-    max_duration: float = 60.0,
+    max_duration: float = 25.0,
     language_code: Optional[str] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
@@ -610,7 +610,7 @@ def main():
     parser.add_argument(
         "--max-duration",
         type=float,
-        default=60.0,
+        default=25.0,
         help="Maximum allowed segment duration in seconds before splitting at a sentence boundary",
     )
     parser.add_argument(
