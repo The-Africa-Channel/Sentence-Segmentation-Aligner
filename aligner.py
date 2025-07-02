@@ -610,7 +610,7 @@ def main():
     parser.add_argument(
         "--max-duration",
         type=float,
-        default=25.0,
+        default=60.0,
         help="Maximum allowed segment duration in seconds before splitting at a sentence boundary",
     )
     parser.add_argument(
