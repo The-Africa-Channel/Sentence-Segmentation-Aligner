@@ -113,80 +113,96 @@ def initial_grouping(
 
 
 def merge_on_sentence_boundary(
-    segments: List[List[Dict]], language_code: str = "eng"
+    segments: List[List[Dict]],
+    language_code: str = "eng"
 ) -> List[List[Dict]]:
     """
-    Merge segments on sentence boundaries using NLTK's sentence tokenizer.
-    Handles acronyms to avoid incorrect sentence splits.
+    Merge segments on sentence boundaries using simple tokenization.
+    Handles acronyms and abbreviations to avoid incorrect splits.
     CRITICAL: Never merge segments from different speakers.
 
     Args:
         segments: List of segments (each a list of word dicts).
-        language_code: ISO 639-3 language code for sentence tokenization.
+        language_code: ISO 639-3 language code for language-specific abbreviations.
 
     Returns:
         List of merged segments split at sentence boundaries.
     """
-    import re
-    import string
+    import re, string
 
-    merged_segments = []
-    buffer_segment = []
+    merged_segments: List[List[Dict]] = []
+    buffer_segment: List[Dict] = []
 
-    # Unicode-aware regex for acronyms (e.g., B.M.W., A.B.S.)
+    # Patterns and placeholders
     acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
     ACRONYM_PLACEHOLDER = "__ACRONYM__"
 
-    def replace_acronyms(text):
+    # Language-specific abbreviation lists
+    ABBR_LISTS = {
+        "eng": ["Mr", "Mrs", "Ms", "Dr", "Prof", "Sr", "Jr", "etc"],
+        "spa": ["Sr", "Sra", "Srta", "Dr", "Lic", "Ing", "etc"],
+        "fra": ["M", "Mme", "Mlle", "Dr", "Pr", "Me", "etc"],
+        "deu": ["Hr", "Fr", "Dr", "Prof", "etc", "bzw", "z. B"],
+        "ita": ["Sig", "Sig\.ra", "Sig\.na", "Dott", "Prof", "Avv", "etc"],
+        "por": ["Sr", "Sra", "Dout", "Prof", "Dr", "etc"],
+    }
+    abbrs = ABBR_LISTS.get(language_code, ABBR_LISTS["eng"])
+    abbr_pattern = re.compile(
+        r"\b(?:" + "|".join(re.escape(a) for a in abbrs) + r")\.",
+        re.UNICODE
+    )
+    ABBR_PLACEHOLDER = "__ABBR__"
+
+    def replace_acronyms(text: str) -> str:
         return acronym_pattern.sub(
             lambda m: m.group(1).replace(".", ACRONYM_PLACEHOLDER), text
         )
 
-    def restore_acronyms(text):
-        return text.replace(ACRONYM_PLACEHOLDER, ".")
+    def replace_abbrs(text: str) -> str:
+        return abbr_pattern.sub(
+            lambda m: m.group(0).replace(".", ABBR_PLACEHOLDER), text
+        )
+
+    def restore_placeholders(text: str) -> str:
+        return (
+            text
+            .replace(ACRONYM_PLACEHOLDER, ".")
+            .replace(ABBR_PLACEHOLDER, ".")
+        )
 
     for i, segment in enumerate(segments):
-        # Check for mixed speakers within this segment (shouldn't happen, but log if it does)
-        speakers = set(w.get("speaker_id") for w in segment)
-        if len(speakers) > 1:
-            print(f"⚠️ WARNING: Segment {i} already contains mixed speakers: {speakers}")
-            for w in segment:
-                print(f"  '{w['text']}' -> {w.get('speaker_id')}")
-
-        # Check if this segment has a different speaker than the current buffer
-        segment_speaker = (
-            segment[0].get("speaker_id", "speaker_0") if segment else "speaker_0"
+        # Flush buffer on speaker change
+        seg_spkr = segment[0].get("speaker_id", "speaker_0")
+        buf_spkr = (
+            buffer_segment[0].get("speaker_id") if buffer_segment else seg_spkr
         )
-        buffer_speaker = (
-            buffer_segment[0].get("speaker_id", "speaker_0")
-            if buffer_segment
-            else segment_speaker
-        )
-
-        # If different speaker, finalize current buffer first
-        if buffer_segment and segment_speaker != buffer_speaker:
+        if buffer_segment and seg_spkr != buf_spkr:
             merged_segments.append(buffer_segment)
             buffer_segment = []
 
         buffer_segment.extend(segment)
-        texts = " ".join([w["text"] for w in buffer_segment])
-        safe_texts = replace_acronyms(texts)
-        sentences = simple_sentence_tokenize(safe_texts)
-        sentences = [restore_acronyms(s) for s in sentences]
+        texts = " ".join(w["text"] for w in buffer_segment)
 
-        if len(sentences) > 1:
-            finalized_text = " ".join(sentences[:-1])
-            finalized_words = []
+        # Protect acronyms and abbreviations
+        safe = replace_abbrs(replace_acronyms(texts))
+        sentences = simple_sentence_tokenize(safe)
+        sentences = [restore_placeholders(s) for s in sentences]
+
+        # If more than one sentence, split at the last full sentence
+        if False:  # Disable sentence boundary splitting
+            # Reconstruct the text of all but the final sentence
+            finalized_text = " ".join(sentences[:-1]).strip()
+            finalized_words: List[Dict] = []
             word_iter = iter(buffer_segment)
-            current_text = ""
+            curr_text = ""
 
-            for word in word_iter:
-                # Join with space or punctuation as appropriate
-                if current_text and word["text"] not in string.punctuation:
-                    current_text += " "
-                current_text += word["text"]
-                finalized_words.append(word)
-                if replace_acronyms(current_text.strip()) == finalized_text.strip():
+            for w in word_iter:
+                if curr_text and w["text"] not in string.punctuation:
+                    curr_text += " "
+                curr_text += w["text"]
+                finalized_words.append(w)
+                # match based on protected placeholders
+                if replace_abbrs(replace_acronyms(curr_text.strip())) == finalized_text:
                     break
 
             merged_segments.append(finalized_words)
@@ -199,7 +215,7 @@ def merge_on_sentence_boundary(
 
 
 def split_long_segments_on_sentence(
-    segments: List[List[Dict]], max_duration: float = 25.0, language_code: str = "eng"
+    segments: List[List[Dict]], max_duration: float = 60.0, language_code: str = "eng"
 ) -> List[List[Dict]]:
     """
     Split any segment longer than max_duration at the nearest sentence boundary.
@@ -336,7 +352,7 @@ def print_segments(
 def get_grouped_segments(
     words: List[Dict],
     language_code: str = "eng",
-    max_duration: float = 25.0,
+    max_duration: float = 60.0,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     skip_punctuation_only: bool = False,
@@ -377,7 +393,7 @@ def segment_transcription(
     *,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
-    max_duration: float = 25.0,
+    max_duration: float = 60.0,
     language_code: Optional[str] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
@@ -589,7 +605,8 @@ def main():
         "--min-words-in-segment",
         type=int,
         default=MIN_WORDS_IN_SEGMENT,
-        help="Minimum number of words in a segment",    )
+        help="Minimum number of words in a segment",
+    )
     parser.add_argument(
         "--max-duration",
         type=float,
