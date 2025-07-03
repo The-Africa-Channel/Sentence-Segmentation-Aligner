@@ -119,6 +119,7 @@ def merge_on_sentence_boundary(
     Merge segments on sentence boundaries using simple tokenization.
     Handles acronyms and abbreviations to avoid incorrect splits.
     CRITICAL: Never merge segments from different speakers.
+    CRITICAL: Never merge segments that were separated by big pauses.
 
     Args:
         segments: List of segments (each a list of word dicts).
@@ -131,84 +132,88 @@ def merge_on_sentence_boundary(
     import string
 
     merged_segments: List[List[Dict]] = []
-    buffer_segment: List[Dict] = []
+    
+    # Process each segment independently - don't merge across big pause boundaries
+    for segment in segments:
+        if not segment:
+            continue
+            
+        # Each segment from initial_grouping should be processed independently
+        # This preserves big pause separations while still handling sentence boundaries within segments
+        text = " ".join(w["text"] for w in segment)
+        
+        # Patterns and placeholders for acronym/abbreviation handling
+        acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
+        ACRONYM_PLACEHOLDER = "__ACRONYM__"
 
-    # Patterns and placeholders
-    acronym_pattern = re.compile(r"((?:[A-ZÄÖÜ]\.){2,})", re.UNICODE)
-    ACRONYM_PLACEHOLDER = "__ACRONYM__"
-
-    # Language-specific abbreviation lists
-    ABBR_LISTS = {
-        "eng": ["Mr", "Mrs", "Ms", "Dr", "Prof", "Sr", "Jr", "etc"],
-        "spa": ["Sr", "Sra", "Srta", "Dr", "Lic", "Ing", "etc"],
-        "fra": ["M", "Mme", "Mlle", "Dr", "Pr", "Me", "etc"],
-        "deu": ["Hr", "Fr", "Dr", "Prof", "etc", "bzw", "z. B"],
-        "ita": ["Sig", r"Sig\.ra", r"Sig\.na", "Dott", "Prof", "Avv", "etc"],
-        "por": ["Sr", "Sra", "Dout", "Prof", "Dr", "etc"],
-    }
-    abbrs = ABBR_LISTS.get(language_code, ABBR_LISTS["eng"])
-    abbr_pattern = re.compile(
-        r"\b(?:" + "|".join(re.escape(a) for a in abbrs) + r")\.", re.UNICODE
-    )
-    ABBR_PLACEHOLDER = "__ABBR__"
-
-    def replace_acronyms(text: str) -> str:
-        return acronym_pattern.sub(
-            lambda m: m.group(1).replace(".", ACRONYM_PLACEHOLDER), text
+        # Language-specific abbreviation lists
+        ABBR_LISTS = {
+            "eng": ["Mr", "Mrs", "Ms", "Dr", "Prof", "Sr", "Jr", "etc"],
+            "spa": ["Sr", "Sra", "Srta", "Dr", "Lic", "Ing", "etc"],
+            "fra": ["M", "Mme", "Mlle", "Dr", "Pr", "Me", "etc"],
+            "deu": ["Hr", "Fr", "Dr", "Prof", "etc", "bzw", "z. B"],
+            "ita": ["Sig", r"Sig\.ra", r"Sig\.na", "Dott", "Prof", "Avv", "etc"],
+            "por": ["Sr", "Sra", "Dout", "Prof", "Dr", "etc"],
+        }
+        abbrs = ABBR_LISTS.get(language_code, ABBR_LISTS["eng"])
+        abbr_pattern = re.compile(
+            r"\b(?:" + "|".join(re.escape(a) for a in abbrs) + r")\.", re.UNICODE
         )
+        ABBR_PLACEHOLDER = "__ABBR__"
 
-    def replace_abbrs(text: str) -> str:
-        return abbr_pattern.sub(
-            lambda m: m.group(0).replace(".", ABBR_PLACEHOLDER), text
-        )
+        def replace_acronyms(text: str) -> str:
+            return acronym_pattern.sub(
+                lambda m: m.group(1).replace(".", ACRONYM_PLACEHOLDER), text
+            )
 
-    def restore_placeholders(text: str) -> str:
-        return text.replace(ACRONYM_PLACEHOLDER, ".").replace(ABBR_PLACEHOLDER, ".")
+        def replace_abbrs(text: str) -> str:
+            return abbr_pattern.sub(
+                lambda m: m.group(0).replace(".", ABBR_PLACEHOLDER), text
+            )
 
-    for i, segment in enumerate(segments):
-        # Flush buffer on speaker change
-        seg_spkr = segment[0].get("speaker_id", "speaker_0")
-        buf_spkr = buffer_segment[0].get("speaker_id") if buffer_segment else seg_spkr
-        if buffer_segment and seg_spkr != buf_spkr:
-            merged_segments.append(buffer_segment)
-            buffer_segment = []
+        def restore_placeholders(text: str) -> str:
+            return text.replace(ACRONYM_PLACEHOLDER, ".").replace(ABBR_PLACEHOLDER, ".")
 
-        buffer_segment.extend(segment)
-        texts = " ".join(w["text"] for w in buffer_segment)
-
-        # Protect acronyms and abbreviations
-        safe = replace_abbrs(replace_acronyms(texts))
+        # Protect acronyms and abbreviations, then tokenize
+        safe = replace_abbrs(replace_acronyms(text))
         sentences = simple_sentence_tokenize(safe)
         sentences = [restore_placeholders(s) for s in sentences]
 
-        # If more than one sentence, split at the last full sentence
-        if len(sentences) > 1:  # Re-enable sentence boundary splitting
-            # Reconstruct the text of all but the final sentence
-            finalized_text = " ".join(sentences[:-1]).strip()
-            finalized_words: List[Dict] = []
-            word_iter = iter(buffer_segment)
-            curr_text = ""
-
-            for w in word_iter:
-                if curr_text and w["text"] not in string.punctuation:
-                    curr_text += " "
-                curr_text += w["text"]
-                finalized_words.append(w)
-                # match based on protected placeholders
-                if replace_abbrs(replace_acronyms(curr_text.strip())) == finalized_text:
-                    break
-
-            merged_segments.append(finalized_words)
-            buffer_segment = list(word_iter)
-
-    if buffer_segment:
-        merged_segments.append(buffer_segment)
+        # If this segment contains multiple sentences, split it
+        if len(sentences) > 1:
+            word_iter = iter(segment)
+            sentence_idx = 0
+            
+            for sentence in sentences:
+                current_words = []
+                current_text = ""
+                
+                # Collect words for this sentence
+                for word in word_iter:
+                    if current_text and word["text"] not in string.punctuation:
+                        current_text += " "
+                    current_text += word["text"]
+                    current_words.append(word)
+                    
+                    # Check if we've completed this sentence
+                    if replace_abbrs(replace_acronyms(current_text.strip())) == sentence.strip():
+                        merged_segments.append(current_words)
+                        current_text = ""
+                        current_words = []
+                        break
+                
+                # Handle any remaining words in the last sentence
+                if current_words:
+                    merged_segments.append(current_words)
+        else:
+            # Single sentence or incomplete sentence - keep as is
+            merged_segments.append(segment)
 
     return merged_segments
 
 
 def split_long_segments_on_sentence(
-    segments: List[List[Dict]], max_duration: float = 25.0, language_code: str = "eng"
+    segments: List[List[Dict]], max_duration: float = 60.0, language_code: str = "eng"
 ) -> List[List[Dict]]:
     """
     Split any segment longer than max_duration at the nearest sentence boundary.
@@ -345,7 +350,7 @@ def print_segments(
 def get_grouped_segments(
     words: List[Dict],
     language_code: str = "eng",
-    max_duration: float = 25.0,
+    max_duration: float = 60.0,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
     skip_punctuation_only: bool = False,
@@ -386,7 +391,7 @@ def segment_transcription(
     *,
     big_pause_seconds: float = BIG_PAUSE_SECONDS,
     min_words_in_segment: int = MIN_WORDS_IN_SEGMENT,
-    max_duration: float = 25.0,
+    max_duration: float = 60.0,
     language_code: Optional[str] = None,
     speaker_brackets: bool = False,
     skip_punctuation_only: bool = False,
@@ -603,7 +608,7 @@ def main():
     parser.add_argument(
         "--max-duration",
         type=float,
-        default=25.0,
+        default=60.0,
         help="Maximum allowed segment duration in seconds before splitting at a sentence boundary",
     )
     parser.add_argument(
